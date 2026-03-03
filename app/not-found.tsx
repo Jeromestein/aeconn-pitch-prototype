@@ -29,10 +29,10 @@ export default function NotFoundPage() {
           Back Home
         </Link>
         <Link
-          href="/admin/dashboard"
+          href="/kiosk"
           className="rounded-lg bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition-all hover:shadow-[0_0_30px_rgba(201,168,76,0.2)]"
         >
-          Go to Dashboard
+          Open Kiosk
         </Link>
       </div>
     </div>

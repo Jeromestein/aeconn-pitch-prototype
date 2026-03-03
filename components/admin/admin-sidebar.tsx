@@ -14,11 +14,14 @@ import {
 } from "lucide-react"
 import { useState } from "react"
 
+const ADMIN_BASE_PATH = "/internal/console"
+const DASHBOARD_PATH = `${ADMIN_BASE_PATH}/dashboard`
+
 const navItems = [
-  { href: "/admin/dashboard", label: "Dashboard", labelZh: "数据概览", icon: LayoutDashboard },
-  { href: "/admin/contacts", label: "Contacts", labelZh: "客户管理", icon: Users },
-  { href: "/admin/visits", label: "Visits", labelZh: "签到流水", icon: ClipboardList },
-  { href: "/admin/campaigns", label: "Campaigns", labelZh: "营销活动", icon: Megaphone },
+  { href: DASHBOARD_PATH, label: "Dashboard", labelZh: "数据概览", icon: LayoutDashboard },
+  { href: `${ADMIN_BASE_PATH}/contacts`, label: "Contacts", labelZh: "客户管理", icon: Users },
+  { href: `${ADMIN_BASE_PATH}/visits`, label: "Visits", labelZh: "签到流水", icon: ClipboardList },
+  { href: `${ADMIN_BASE_PATH}/campaigns`, label: "Campaigns", labelZh: "营销活动", icon: Megaphone },
 ]
 
 export function AdminSidebar() {
@@ -32,10 +35,10 @@ export function AdminSidebar() {
         collapsed ? "w-[72px]" : "w-[260px]"
       }`}
     >
-      {/* Header */}
+        {/* Header */}
       <div className="flex h-16 items-center justify-between border-b border-border/50 px-4">
         {!collapsed && (
-          <Link href="/admin/dashboard" className="flex items-center gap-2.5">
+          <Link href={DASHBOARD_PATH} className="flex items-center gap-2.5">
             <div className="flex h-8 w-8 items-center justify-center rounded-lg border border-primary/30 bg-background">
               <span className="text-base font-bold text-primary">A</span>
             </div>
@@ -63,7 +66,7 @@ export function AdminSidebar() {
           {navItems.map((item) => {
             const isActive =
               pathname === item.href ||
-              (item.href !== "/admin/dashboard" && pathname.startsWith(item.href))
+              (item.href !== DASHBOARD_PATH && pathname.startsWith(item.href))
             return (
               <li key={item.href}>
                 <Link
@@ -95,7 +98,7 @@ export function AdminSidebar() {
       {/* Footer */}
       <div className="border-t border-border/50 p-3">
         <Link
-          href="/admin"
+          href={ADMIN_BASE_PATH}
           className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
         >
           <LogOut className="h-5 w-5 flex-shrink-0" />
