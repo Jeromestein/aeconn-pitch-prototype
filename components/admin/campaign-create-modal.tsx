@@ -1,26 +1,28 @@
 "use client"
 
-import { useState } from "react"
-import { X, Users, Mail, Eye, Send } from "lucide-react"
+import {useState} from "react"
+import {X, Users, Mail, Eye, Send} from "lucide-react"
+import {useTranslations} from "next-intl"
 
 interface CampaignCreateModalProps {
   onClose: () => void
 }
 
-const audienceFilters = [
-  { id: "email_opt_in", label: "Email Opted In", count: 102 },
-  { id: "vip", label: "VIP Customers", count: 28 },
-  { id: "new_customer", label: "New Customers (30d)", count: 34 },
-  { id: "high_intent", label: "High Intent", count: 45 },
-  { id: "return_visit", label: "Return Visitors", count: 38 },
-]
-
-export function CampaignCreateModal({ onClose }: CampaignCreateModalProps) {
+export function CampaignCreateModal({onClose}: CampaignCreateModalProps) {
+  const t = useTranslations("campaignCreateModal")
   const [step, setStep] = useState<"config" | "preview" | "sent">("config")
   const [name, setName] = useState("")
   const [subject, setSubject] = useState("")
   const [selectedFilters, setSelectedFilters] = useState<string[]>(["email_opt_in"])
   const [isSending, setIsSending] = useState(false)
+
+  const audienceFilters = [
+    {id: "email_opt_in", label: t("filterEmailOptIn"), count: 102},
+    {id: "vip", label: t("filterVip"), count: 28},
+    {id: "new_customer", label: t("filterNew"), count: 34},
+    {id: "high_intent", label: t("filterHighIntent"), count: 45},
+    {id: "return_visit", label: t("filterReturn"), count: 38},
+  ]
 
   const totalAudience = audienceFilters
     .filter((f) => selectedFilters.includes(f.id))
@@ -36,11 +38,8 @@ export function CampaignCreateModal({ onClose }: CampaignCreateModalProps) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm">
       <div className="w-full max-w-4xl rounded-xl border border-border/50 bg-card shadow-2xl">
-        {/* Header */}
         <div className="flex items-center justify-between border-b border-border/50 px-6 py-4">
-          <h2 className="text-lg font-semibold text-foreground">
-            {step === "sent" ? "Campaign Sent" : "New Email Campaign"}
-          </h2>
+          <h2 className="text-lg font-semibold text-foreground">{step === "sent" ? t("titleSent") : t("titleNew")}</h2>
           <button
             onClick={onClose}
             className="rounded-md p-1 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
@@ -55,30 +54,29 @@ export function CampaignCreateModal({ onClose }: CampaignCreateModalProps) {
               <Send className="h-8 w-8 text-emerald-400" />
             </div>
             <div className="text-center">
-              <h3 className="text-xl font-semibold text-foreground">Campaign Queued</h3>
+              <h3 className="text-xl font-semibold text-foreground">{t("queuedTitle")}</h3>
               <p className="mt-2 text-muted-foreground">
-                Your campaign &quot;{name || "Untitled Campaign"}&quot; has been queued for delivery to {totalAudience} recipients.
+                {t("queuedBody", {name: name || t("untitled"), count: totalAudience})}
               </p>
             </div>
             <button
               onClick={onClose}
               className="rounded-lg bg-primary px-6 py-2.5 text-sm font-semibold text-primary-foreground transition-all hover:shadow-[0_0_30px_rgba(201,168,76,0.2)]"
             >
-              Back to Campaigns
+              {t("back")}
             </button>
           </div>
         ) : (
           <div className="flex flex-col lg:flex-row">
-            {/* Left: Configuration */}
             <div className="flex-1 border-b border-border/50 p-6 lg:border-b-0 lg:border-r">
-              <h3 className="text-sm font-medium text-muted-foreground">Campaign Settings</h3>
+              <h3 className="text-sm font-medium text-muted-foreground">{t("settings")}</h3>
 
               <div className="mt-4 flex flex-col gap-4">
                 <div className="flex flex-col gap-1.5">
-                  <label className="text-sm font-medium text-foreground">Campaign Name</label>
+                  <label className="text-sm font-medium text-foreground">{t("nameLabel")}</label>
                   <input
                     type="text"
-                    placeholder="e.g., Spring Promotion"
+                    placeholder={t("namePlaceholder")}
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     className="rounded-lg border border-border bg-surface-2 px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/50 transition-all hover:border-primary/40 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30"
@@ -86,10 +84,10 @@ export function CampaignCreateModal({ onClose }: CampaignCreateModalProps) {
                 </div>
 
                 <div className="flex flex-col gap-1.5">
-                  <label className="text-sm font-medium text-foreground">Email Subject</label>
+                  <label className="text-sm font-medium text-foreground">{t("subjectLabel")}</label>
                   <input
                     type="text"
-                    placeholder="e.g., You're Invited..."
+                    placeholder={t("subjectPlaceholder")}
                     value={subject}
                     onChange={(e) => setSubject(e.target.value)}
                     className="rounded-lg border border-border bg-surface-2 px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/50 transition-all hover:border-primary/40 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30"
@@ -99,7 +97,7 @@ export function CampaignCreateModal({ onClose }: CampaignCreateModalProps) {
                 <div className="flex flex-col gap-1.5">
                   <label className="text-sm font-medium text-foreground">
                     <Users className="mr-1.5 inline h-4 w-4" />
-                    Audience Filters
+                    {t("filters")}
                   </label>
                   <div className="flex flex-col gap-2">
                     {audienceFilters.map((f) => (
@@ -111,7 +109,7 @@ export function CampaignCreateModal({ onClose }: CampaignCreateModalProps) {
                           <div
                             onClick={() =>
                               setSelectedFilters((prev) =>
-                                prev.includes(f.id) ? prev.filter((x) => x !== f.id) : [...prev, f.id]
+                                prev.includes(f.id) ? prev.filter((x) => x !== f.id) : [...prev, f.id],
                               )
                             }
                             className={`flex h-4 w-4 items-center justify-center rounded border transition-all ${
@@ -128,7 +126,7 @@ export function CampaignCreateModal({ onClose }: CampaignCreateModalProps) {
                           </div>
                           <span className="text-sm text-foreground">{f.label}</span>
                         </div>
-                        <span className="text-xs text-muted-foreground">{f.count} people</span>
+                        <span className="text-xs text-muted-foreground">{t("people", {count: f.count})}</span>
                       </label>
                     ))}
                   </div>
@@ -137,17 +135,14 @@ export function CampaignCreateModal({ onClose }: CampaignCreateModalProps) {
 
               <div className="mt-5 flex items-center gap-2 rounded-lg bg-primary/5 px-4 py-3">
                 <Mail className="h-4 w-4 text-primary" />
-                <span className="text-sm text-primary font-medium">
-                  Estimated audience: {totalAudience} recipients
-                </span>
+                <span className="text-sm font-medium text-primary">{t("audienceEstimate", {count: totalAudience})}</span>
               </div>
             </div>
 
-            {/* Right: Preview */}
             <div className="flex flex-1 flex-col p-6">
               <h3 className="text-sm font-medium text-muted-foreground">
                 <Eye className="mr-1.5 inline h-4 w-4" />
-                Email Preview
+                {t("preview")}
               </h3>
 
               <div className="mt-4 flex-1 rounded-lg border border-border/50 bg-surface-2 p-6">
@@ -159,24 +154,18 @@ export function CampaignCreateModal({ onClose }: CampaignCreateModalProps) {
                     <span className="text-sm font-semibold text-foreground">Aeconn</span>
                   </div>
                   <div className="h-px w-full bg-border/50" />
-                  <h4 className="text-lg font-semibold text-foreground">
-                    {subject || "Email subject will appear here..."}
-                  </h4>
-                  <p className="text-sm text-muted-foreground leading-relaxed">
-                    Dear Customer,
-                    <br /><br />
-                    Thank you for visiting Aeconn. We&apos;re excited to share our latest updates with you.
-                    As a valued member of our community, you have exclusive access to premium offerings.
-                    <br /><br />
-                    Click below to learn more about what we have prepared for you.
+                  <h4 className="text-lg font-semibold text-foreground">{subject || t("previewSubjectPlaceholder")}</h4>
+                  <p className="text-sm leading-relaxed text-muted-foreground">
+                    {t("previewGreeting")}
+                    <br />
+                    <br />
+                    {t("previewBody")}
                   </p>
                   <div className="mt-2 inline-flex self-start rounded-lg bg-primary px-6 py-2.5 text-sm font-semibold text-primary-foreground">
-                    Learn More
+                    {t("previewCta")}
                   </div>
                   <div className="mt-4 h-px w-full bg-border/50" />
-                  <p className="text-xs text-muted-foreground/60">
-                    Aeconn Inc. | You&apos;re receiving this because you opted in.
-                  </p>
+                  <p className="text-xs text-muted-foreground/60">{t("previewFooter")}</p>
                 </div>
               </div>
 
@@ -185,7 +174,7 @@ export function CampaignCreateModal({ onClose }: CampaignCreateModalProps) {
                   onClick={onClose}
                   className="rounded-lg border border-border px-4 py-2.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-surface-2 hover:text-foreground"
                 >
-                  Save as Draft
+                  {t("saveDraft")}
                 </button>
                 <button
                   onClick={handleSend}
@@ -198,12 +187,12 @@ export function CampaignCreateModal({ onClose }: CampaignCreateModalProps) {
                         <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" className="opacity-25" />
                         <path d="M4 12a8 8 0 018-8" stroke="currentColor" strokeWidth="3" strokeLinecap="round" className="opacity-75" />
                       </svg>
-                      Sending...
+                      {t("sending")}
                     </span>
                   ) : (
                     <>
                       <Send className="h-4 w-4" />
-                      Send Campaign
+                      {t("send")}
                     </>
                   )}
                 </button>

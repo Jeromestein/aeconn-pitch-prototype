@@ -9,17 +9,20 @@ import {
   ResponsiveContainer,
   Tooltip,
 } from "recharts"
+import {useTranslations} from "next-intl"
 
 interface HourlyChartProps {
   data: { hour: string; count: number }[]
 }
 
 export function DashboardHourlyChart({ data }: HourlyChartProps) {
+  const t = useTranslations("charts")
+
   return (
     <div className="rounded-xl border border-border/50 bg-card p-5">
       <div className="mb-4">
-        <h3 className="text-base font-semibold text-foreground">Hourly Distribution</h3>
-        <p className="text-sm text-muted-foreground">Check-in volume by hour today</p>
+        <h3 className="text-base font-semibold text-foreground">{t("hourlyTitle")}</h3>
+        <p className="text-sm text-muted-foreground">{t("hourlySubtitle")}</p>
       </div>
       <div className="h-[280px]">
         <ResponsiveContainer width="100%" height="100%">
@@ -54,7 +57,7 @@ export function DashboardHourlyChart({ data }: HourlyChartProps) {
             <Bar
               dataKey="count"
               fill="url(#hourlyGradient)"
-              name="Check-ins"
+              name={t("hourlyCheckins")}
               radius={[4, 4, 0, 0]}
               barSize={20}
             />

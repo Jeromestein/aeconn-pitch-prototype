@@ -1,6 +1,7 @@
 "use client"
 
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts"
+import {useTranslations} from "next-intl"
 
 interface PieChartProps {
   data: { tag: string; count: number }[]
@@ -9,11 +10,13 @@ interface PieChartProps {
 const COLORS = ["#C9A84C", "#D4AF37", "#8B7536", "#E6CE70", "#A08C3A", "#6B5E2D"]
 
 export function DashboardPieChart({ data }: PieChartProps) {
+  const t = useTranslations("charts")
+
   return (
     <div className="rounded-xl border border-border/50 bg-card p-5">
       <div className="mb-4">
-        <h3 className="text-base font-semibold text-foreground">Tag Distribution</h3>
-        <p className="text-sm text-muted-foreground">Customer tag breakdown</p>
+        <h3 className="text-base font-semibold text-foreground">{t("pieTitle")}</h3>
+        <p className="text-sm text-muted-foreground">{t("pieSubtitle")}</p>
       </div>
       <div className="h-[200px]">
         <ResponsiveContainer width="100%" height="100%">

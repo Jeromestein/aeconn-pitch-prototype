@@ -10,17 +10,20 @@ import {
   Tooltip,
   Legend,
 } from "recharts"
+import {useTranslations} from "next-intl"
 
 interface BarChartProps {
   data: { day: string; checkins: number; newContacts: number }[]
 }
 
 export function DashboardBarChart({ data }: BarChartProps) {
+  const t = useTranslations("charts")
+
   return (
     <div className="rounded-xl border border-border/50 bg-card p-5">
       <div className="mb-4">
-        <h3 className="text-base font-semibold text-foreground">Weekly Overview</h3>
-        <p className="text-sm text-muted-foreground">Check-ins vs new contacts this week</p>
+        <h3 className="text-base font-semibold text-foreground">{t("barTitle")}</h3>
+        <p className="text-sm text-muted-foreground">{t("barSubtitle")}</p>
       </div>
       <div className="h-[280px]">
         <ResponsiveContainer width="100%" height="100%">
@@ -52,14 +55,14 @@ export function DashboardBarChart({ data }: BarChartProps) {
             <Bar
               dataKey="checkins"
               fill="#C9A84C"
-              name="Check-ins"
+              name={t("barCheckins")}
               radius={[4, 4, 0, 0]}
               barSize={24}
             />
             <Bar
               dataKey="newContacts"
               fill="#8B7536"
-              name="New Contacts"
+              name={t("barNewContacts")}
               radius={[4, 4, 0, 0]}
               barSize={24}
             />

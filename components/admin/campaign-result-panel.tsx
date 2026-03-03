@@ -1,6 +1,7 @@
 "use client"
 
 import { X, CheckCircle2, Eye, MousePointerClick, AlertTriangle, XCircle } from "lucide-react"
+import {useTranslations} from "next-intl"
 import type { Campaign, CampaignMessage } from "@/lib/mock-data"
 import {
   Bar,
@@ -19,6 +20,7 @@ interface CampaignResultPanelProps {
 }
 
 export function CampaignResultPanel({ campaign, messages, onClose }: CampaignResultPanelProps) {
+  const t = useTranslations("campaignResultPanel")
   const stats = {
     delivered: messages.filter((m) => m.status === "delivered").length,
     opened: messages.filter((m) => m.status === "opened").length,
@@ -28,11 +30,11 @@ export function CampaignResultPanel({ campaign, messages, onClose }: CampaignRes
   }
 
   const chartData = [
-    { name: "Delivered", value: stats.delivered, color: "#C9A84C" },
-    { name: "Opened", value: stats.opened, color: "#D4AF37" },
-    { name: "Clicked", value: stats.clicked, color: "#E6CE70" },
-    { name: "Bounced", value: stats.bounced, color: "#A08C3A" },
-    { name: "Failed", value: stats.failed, color: "#B33A3A" },
+    { name: t("delivered"), value: stats.delivered, color: "#C9A84C" },
+    { name: t("opened"), value: stats.opened, color: "#D4AF37" },
+    { name: t("clicked"), value: stats.clicked, color: "#E6CE70" },
+    { name: t("bounced"), value: stats.bounced, color: "#A08C3A" },
+    { name: t("failed"), value: stats.failed, color: "#B33A3A" },
   ]
 
   const total = messages.length
@@ -46,7 +48,7 @@ export function CampaignResultPanel({ campaign, messages, onClose }: CampaignRes
     <div className="flex w-full flex-col border-l border-border/50 bg-surface-1 lg:w-[450px]">
       {/* Header */}
       <div className="flex items-center justify-between border-b border-border/50 px-6 py-4">
-        <h3 className="text-base font-semibold text-foreground">Campaign Results</h3>
+        <h3 className="text-base font-semibold text-foreground">{t("title")}</h3>
         <button
           onClick={onClose}
           className="rounded-md p-1 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
@@ -61,8 +63,8 @@ export function CampaignResultPanel({ campaign, messages, onClose }: CampaignRes
           <h4 className="text-lg font-semibold text-foreground">{campaign.name}</h4>
           <p className="mt-1 text-sm text-muted-foreground">{campaign.subject}</p>
           <p className="mt-2 text-xs text-muted-foreground/60">
-            Created: {formatDate(campaign.createdAt)}
-            {campaign.sentAt && ` | Sent: ${formatDate(campaign.sentAt)}`}
+            {t("created")}: {formatDate(campaign.createdAt)}
+            {campaign.sentAt && ` | ${t("sent")}: ${formatDate(campaign.sentAt)}`}
           </p>
         </div>
 
@@ -71,7 +73,7 @@ export function CampaignResultPanel({ campaign, messages, onClose }: CampaignRes
           <div className="rounded-lg bg-background p-3">
             <div className="flex items-center gap-2 text-emerald-400">
               <CheckCircle2 className="h-4 w-4" />
-              <span className="text-xs font-medium">Delivered</span>
+              <span className="text-xs font-medium">{t("delivered")}</span>
             </div>
             <p className="mt-1 text-xl font-bold text-foreground">{stats.delivered}</p>
             <p className="text-xs text-muted-foreground">{total > 0 ? Math.round((stats.delivered / total) * 100) : 0}%</p>
@@ -79,7 +81,7 @@ export function CampaignResultPanel({ campaign, messages, onClose }: CampaignRes
           <div className="rounded-lg bg-background p-3">
             <div className="flex items-center gap-2 text-primary">
               <Eye className="h-4 w-4" />
-              <span className="text-xs font-medium">Opened</span>
+              <span className="text-xs font-medium">{t("opened")}</span>
             </div>
             <p className="mt-1 text-xl font-bold text-foreground">{stats.opened}</p>
             <p className="text-xs text-muted-foreground">{campaign.openRate || 0}%</p>
@@ -87,7 +89,7 @@ export function CampaignResultPanel({ campaign, messages, onClose }: CampaignRes
           <div className="rounded-lg bg-background p-3">
             <div className="flex items-center gap-2 text-gold-light">
               <MousePointerClick className="h-4 w-4" />
-              <span className="text-xs font-medium">Clicked</span>
+              <span className="text-xs font-medium">{t("clicked")}</span>
             </div>
             <p className="mt-1 text-xl font-bold text-foreground">{stats.clicked}</p>
             <p className="text-xs text-muted-foreground">{campaign.clickRate || 0}%</p>
@@ -95,7 +97,7 @@ export function CampaignResultPanel({ campaign, messages, onClose }: CampaignRes
           <div className="rounded-lg bg-background p-3">
             <div className="flex items-center gap-2 text-red-400">
               <XCircle className="h-4 w-4" />
-              <span className="text-xs font-medium">Failed</span>
+              <span className="text-xs font-medium">{t("failed")}</span>
             </div>
             <p className="mt-1 text-xl font-bold text-foreground">{stats.failed + stats.bounced}</p>
             <p className="text-xs text-muted-foreground">{total > 0 ? Math.round(((stats.failed + stats.bounced) / total) * 100) : 0}%</p>
@@ -104,7 +106,7 @@ export function CampaignResultPanel({ campaign, messages, onClose }: CampaignRes
 
         {/* Chart */}
         <div className="mt-6">
-          <h4 className="text-sm font-medium text-muted-foreground">Message Distribution</h4>
+          <h4 className="text-sm font-medium text-muted-foreground">{t("distribution")}</h4>
           <div className="mt-3 h-[200px]">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={chartData} margin={{ top: 5, right: 5, left: -15, bottom: 0 }}>
@@ -143,7 +145,7 @@ export function CampaignResultPanel({ campaign, messages, onClose }: CampaignRes
           <div className="mt-6">
             <h4 className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
               <AlertTriangle className="h-4 w-4 text-red-400" />
-              Failure Reasons
+              {t("failureReasons")}
             </h4>
             <div className="mt-2 flex flex-col gap-2">
               {messages

@@ -2,12 +2,14 @@
 
 import { useEffect, useState } from "react"
 import { CheckCircle2 } from "lucide-react"
+import {useTranslations} from "next-intl"
 
 interface KioskSuccessProps {
   onReset: () => void
 }
 
 export function KioskSuccess({ onReset }: KioskSuccessProps) {
+  const t = useTranslations("kioskSuccess")
   const [countdown, setCountdown] = useState(8)
 
   useEffect(() => {
@@ -40,10 +42,10 @@ export function KioskSuccess({ onReset }: KioskSuccessProps) {
       {/* Message */}
       <div className="flex flex-col gap-3">
         <h2 className="text-3xl font-bold text-foreground">
-          Check-in Complete
+          {t("title")}
         </h2>
         <p className="text-balance text-lg text-muted-foreground">
-          Your information has been saved. Our team will assist you shortly.
+          {t("subtitle")}
         </p>
       </div>
 
@@ -56,7 +58,7 @@ export function KioskSuccess({ onReset }: KioskSuccessProps) {
           />
         </div>
         <p className="text-sm text-muted-foreground">
-          Auto reset in {countdown}s
+          {t("countdown", {seconds: countdown})}
         </p>
       </div>
 
@@ -65,7 +67,7 @@ export function KioskSuccess({ onReset }: KioskSuccessProps) {
         onClick={onReset}
         className="rounded-lg border border-border px-6 py-3 text-sm font-medium text-muted-foreground transition-colors hover:border-primary/40 hover:text-foreground"
       >
-        New Check-in
+        {t("newCheckin")}
       </button>
     </div>
   )

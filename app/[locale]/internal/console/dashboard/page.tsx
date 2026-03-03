@@ -1,56 +1,56 @@
 "use client"
 
-import { TrendingUp, TrendingDown, Users, ClipboardCheck, ShieldCheck, Timer } from "lucide-react"
-import { mockDashboard } from "@/lib/mock-data"
-import { DashboardTrendChart } from "@/components/admin/dashboard-trend-chart"
-import { DashboardBarChart } from "@/components/admin/dashboard-bar-chart"
-import { DashboardPieChart } from "@/components/admin/dashboard-pie-chart"
-import { DashboardHourlyChart } from "@/components/admin/dashboard-hourly-chart"
-
-const metrics = [
-  {
-    label: "Today Check-ins",
-    labelZh: "今日签到",
-    value: mockDashboard.todayCheckins,
-    delta: mockDashboard.todayCheckinsDelta,
-    icon: ClipboardCheck,
-  },
-  {
-    label: "Total Contacts",
-    labelZh: "总客户数",
-    value: mockDashboard.totalContacts,
-    delta: mockDashboard.totalContactsDelta,
-    icon: Users,
-  },
-  {
-    label: "Consent Rate",
-    labelZh: "同意率",
-    value: `${mockDashboard.consentRate}%`,
-    delta: mockDashboard.consentRateDelta,
-    icon: ShieldCheck,
-  },
-  {
-    label: "Avg Check-in",
-    labelZh: "平均签到耗时",
-    value: mockDashboard.avgCheckinTime,
-    delta: -2.1,
-    icon: Timer,
-    invertDelta: true,
-  },
-]
+import {TrendingUp, TrendingDown, Users, ClipboardCheck, ShieldCheck, Timer} from "lucide-react"
+import {useTranslations} from "next-intl"
+import {mockDashboard} from "@/lib/mock-data"
+import {DashboardTrendChart} from "@/components/admin/dashboard-trend-chart"
+import {DashboardBarChart} from "@/components/admin/dashboard-bar-chart"
+import {DashboardPieChart} from "@/components/admin/dashboard-pie-chart"
+import {DashboardHourlyChart} from "@/components/admin/dashboard-hourly-chart"
 
 export default function DashboardPage() {
+  const t = useTranslations("dashboard")
+
+  const metrics = [
+    {
+      label: t("metricTodayCheckins"),
+      value: mockDashboard.todayCheckins,
+      delta: mockDashboard.todayCheckinsDelta,
+      icon: ClipboardCheck,
+    },
+    {
+      label: t("metricTotalContacts"),
+      value: mockDashboard.totalContacts,
+      delta: mockDashboard.totalContactsDelta,
+      icon: Users,
+    },
+    {
+      label: t("metricConsentRate"),
+      value: `${mockDashboard.consentRate}%`,
+      delta: mockDashboard.consentRateDelta,
+      icon: ShieldCheck,
+    },
+    {
+      label: t("metricAvgCheckin"),
+      value: mockDashboard.avgCheckinTime,
+      delta: -2.1,
+      icon: Timer,
+      invertDelta: true,
+    },
+  ]
+
+  const weeklyTrendData = mockDashboard.weeklyTrend.map((item, index) => ({
+    ...item,
+    day: t(`weekday${index}`),
+  }))
+
   return (
     <div className="flex flex-col gap-6 p-6 lg:p-8">
-      {/* Page header */}
       <div className="flex flex-col gap-1">
-        <h1 className="text-2xl font-bold text-foreground">Dashboard</h1>
-        <p className="text-sm text-muted-foreground">
-          Overview of your check-in and marketing data
-        </p>
+        <h1 className="text-2xl font-bold text-foreground">{t("title")}</h1>
+        <p className="text-sm text-muted-foreground">{t("subtitle")}</p>
       </div>
 
-      {/* Metric cards */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
         {metrics.map((m) => {
           const isPositive = m.invertDelta ? m.delta < 0 : m.delta > 0
@@ -62,7 +62,6 @@ export default function DashboardPage() {
               <div className="flex items-start justify-between">
                 <div className="flex flex-col gap-1">
                   <p className="text-sm text-muted-foreground">{m.label}</p>
-                  <p className="text-xs text-muted-foreground/60">{m.labelZh}</p>
                 </div>
                 <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10 text-primary">
                   <m.icon className="h-4 w-4" />
@@ -88,7 +87,6 @@ export default function DashboardPage() {
         })}
       </div>
 
-      {/* Charts row 1 */}
       <div className="grid grid-cols-1 gap-4 xl:grid-cols-3">
         <div className="xl:col-span-2">
           <DashboardTrendChart data={mockDashboard.monthlyTrend} />
@@ -98,9 +96,8 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* Charts row 2 */}
       <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
-        <DashboardBarChart data={mockDashboard.weeklyTrend} />
+        <DashboardBarChart data={weeklyTrendData} />
         <DashboardHourlyChart data={mockDashboard.hourlyDistribution} />
       </div>
     </div>

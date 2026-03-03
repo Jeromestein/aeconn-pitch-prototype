@@ -9,21 +9,24 @@ import {
   ResponsiveContainer,
   Tooltip,
 } from "recharts"
+import {useTranslations} from "next-intl"
 
 interface TrendChartProps {
   data: { date: string; checkins: number }[]
 }
 
 export function DashboardTrendChart({ data }: TrendChartProps) {
+  const t = useTranslations("charts")
+
   return (
     <div className="rounded-xl border border-border/50 bg-card p-5">
       <div className="mb-4 flex items-center justify-between">
         <div>
-          <h3 className="text-base font-semibold text-foreground">Check-in Trend</h3>
-          <p className="text-sm text-muted-foreground">Daily check-ins over 30 days</p>
+          <h3 className="text-base font-semibold text-foreground">{t("trendTitle")}</h3>
+          <p className="text-sm text-muted-foreground">{t("trendSubtitle")}</p>
         </div>
         <div className="flex items-center gap-2 rounded-lg bg-surface-2 px-3 py-1.5 text-xs text-muted-foreground">
-          Last 30 Days
+          {t("trendLast30")}
         </div>
       </div>
       <div className="h-[280px]">
@@ -63,7 +66,7 @@ export function DashboardTrendChart({ data }: TrendChartProps) {
               stroke="#C9A84C"
               strokeWidth={2}
               fill="url(#goldGradient)"
-              name="Check-ins"
+              name={t("trendCheckins")}
             />
           </AreaChart>
         </ResponsiveContainer>

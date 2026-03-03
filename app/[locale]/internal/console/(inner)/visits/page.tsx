@@ -1,12 +1,14 @@
 "use client"
 
-import { useState, useMemo } from "react"
-import { Search, ChevronLeft, ChevronRight, Monitor, Globe, Hand } from "lucide-react"
-import { mockVisits } from "@/lib/mock-data"
+import {useState, useMemo} from "react"
+import {Search, ChevronLeft, ChevronRight, Monitor, Globe, Hand} from "lucide-react"
+import {useTranslations} from "next-intl"
+import {mockVisits} from "@/lib/mock-data"
 
 const PAGE_SIZE = 15
 
 export default function VisitsPage() {
+  const t = useTranslations("visitsPage")
   const [search, setSearch] = useState("")
   const [statusFilter, setStatusFilter] = useState<string | null>(null)
   const [page, setPage] = useState(1)
@@ -31,65 +33,82 @@ export default function VisitsPage() {
     return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")} ${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`
   }
 
+  const sourceLabel = (source: string) => {
+    if (source === "kiosk") return t("sourceKiosk")
+    if (source === "web") return t("sourceWeb")
+    return t("sourceManual")
+  }
+
   const sourceIcon = (source: string) => {
     if (source === "kiosk") return <Monitor className="h-3.5 w-3.5" />
     if (source === "web") return <Globe className="h-3.5 w-3.5" />
     return <Hand className="h-3.5 w-3.5" />
   }
 
+  const statusLabel = (status: "completed" | "pending" | "cancelled") => {
+    if (status === "completed") return t("statusCompleted")
+    if (status === "pending") return t("statusPending")
+    return t("statusCancelled")
+  }
+
+  const filters = [
+    {id: "all", label: t("filterAll")},
+    {id: "completed", label: t("filterCompleted")},
+    {id: "pending", label: t("filterPending")},
+    {id: "cancelled", label: t("filterCancelled")},
+  ]
+
   return (
     <div className="flex flex-col gap-6 p-6 lg:p-8">
-      {/* Header */}
       <div className="flex flex-col gap-1">
-        <h1 className="text-2xl font-bold text-foreground">Visit Records</h1>
-        <p className="text-sm text-muted-foreground">
-          {filtered.length} check-in records
-        </p>
+        <h1 className="text-2xl font-bold text-foreground">{t("title")}</h1>
+        <p className="text-sm text-muted-foreground">{t("summary", {count: filtered.length})}</p>
       </div>
 
-      {/* Filters */}
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground/50" />
           <input
             type="text"
-            placeholder="Search by name or ID..."
+            placeholder={t("searchPlaceholder")}
             value={search}
-            onChange={(e) => { setSearch(e.target.value); setPage(1) }}
+            onChange={(e) => {
+              setSearch(e.target.value)
+              setPage(1)
+            }}
             className="w-full rounded-lg border border-border bg-surface-2 py-2.5 pl-9 pr-4 text-sm text-foreground placeholder:text-muted-foreground/50 transition-all hover:border-primary/40 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30"
           />
         </div>
         <div className="flex items-center gap-2">
-          {["all", "completed", "pending", "cancelled"].map((s) => (
+          {filters.map((filter) => (
             <button
-              key={s}
+              key={filter.id}
               onClick={() => {
-                setStatusFilter(s === "all" ? null : s)
+                setStatusFilter(filter.id === "all" ? null : filter.id)
                 setPage(1)
               }}
-              className={`rounded-full px-3 py-1 text-xs font-medium capitalize transition-colors ${
-                (s === "all" && !statusFilter) || s === statusFilter
+              className={`rounded-full px-3 py-1 text-xs font-medium transition-colors ${
+                (filter.id === "all" && !statusFilter) || filter.id === statusFilter
                   ? "bg-primary/15 text-primary"
                   : "bg-surface-2 text-muted-foreground hover:text-foreground"
               }`}
             >
-              {s}
+              {filter.label}
             </button>
           ))}
         </div>
       </div>
 
-      {/* Table */}
       <div className="overflow-x-auto rounded-xl border border-border/50">
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-border/50 bg-surface-1">
-              <th className="px-4 py-3 text-left font-medium text-muted-foreground">ID</th>
-              <th className="px-4 py-3 text-left font-medium text-muted-foreground">Contact</th>
-              <th className="hidden px-4 py-3 text-left font-medium text-muted-foreground sm:table-cell">Source</th>
-              <th className="hidden px-4 py-3 text-left font-medium text-muted-foreground md:table-cell">Kiosk</th>
-              <th className="px-4 py-3 text-left font-medium text-muted-foreground">Status</th>
-              <th className="px-4 py-3 text-left font-medium text-muted-foreground">Time</th>
+              <th className="px-4 py-3 text-left font-medium text-muted-foreground">{t("headerId")}</th>
+              <th className="px-4 py-3 text-left font-medium text-muted-foreground">{t("headerContact")}</th>
+              <th className="hidden px-4 py-3 text-left font-medium text-muted-foreground sm:table-cell">{t("headerSource")}</th>
+              <th className="hidden px-4 py-3 text-left font-medium text-muted-foreground md:table-cell">{t("headerKiosk")}</th>
+              <th className="px-4 py-3 text-left font-medium text-muted-foreground">{t("headerStatus")}</th>
+              <th className="px-4 py-3 text-left font-medium text-muted-foreground">{t("headerTime")}</th>
             </tr>
           </thead>
           <tbody>
@@ -105,17 +124,21 @@ export default function VisitsPage() {
                 <td className="hidden px-4 py-3 sm:table-cell">
                   <div className="flex items-center gap-1.5 text-muted-foreground">
                     {sourceIcon(v.source)}
-                    <span className="capitalize text-xs">{v.source}</span>
+                    <span className="text-xs">{sourceLabel(v.source)}</span>
                   </div>
                 </td>
                 <td className="hidden px-4 py-3 text-muted-foreground md:table-cell">{v.kioskId}</td>
                 <td className="px-4 py-3">
-                  <span className={`inline-flex rounded-full px-2.5 py-0.5 text-xs font-medium ${
-                    v.status === "completed" ? "bg-emerald-500/15 text-emerald-400"
-                    : v.status === "pending" ? "bg-yellow-500/15 text-yellow-400"
-                    : "bg-red-500/15 text-red-400"
-                  }`}>
-                    {v.status}
+                  <span
+                    className={`inline-flex rounded-full px-2.5 py-0.5 text-xs font-medium ${
+                      v.status === "completed"
+                        ? "bg-emerald-500/15 text-emerald-400"
+                        : v.status === "pending"
+                          ? "bg-yellow-500/15 text-yellow-400"
+                          : "bg-red-500/15 text-red-400"
+                    }`}
+                  >
+                    {statusLabel(v.status)}
                   </span>
                 </td>
                 <td className="px-4 py-3 text-sm text-muted-foreground">{formatDate(v.checkedInAt)}</td>
@@ -125,11 +148,8 @@ export default function VisitsPage() {
         </table>
       </div>
 
-      {/* Pagination */}
       <div className="flex items-center justify-between">
-        <p className="text-sm text-muted-foreground">
-          Page {page} of {totalPages}
-        </p>
+        <p className="text-sm text-muted-foreground">{t("page", {page, total: totalPages})}</p>
         <div className="flex items-center gap-2">
           <button
             onClick={() => setPage(Math.max(1, page - 1))}

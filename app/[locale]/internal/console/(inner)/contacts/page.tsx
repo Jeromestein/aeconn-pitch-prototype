@@ -1,14 +1,16 @@
 "use client"
 
-import { useState, useMemo } from "react"
-import { Search, Filter, ChevronLeft, ChevronRight, Mail, Phone, Check, X } from "lucide-react"
-import { mockContacts } from "@/lib/mock-data"
-import type { Contact } from "@/lib/mock-data"
-import { ContactDetailPanel } from "@/components/admin/contact-detail-panel"
+import {useState, useMemo} from "react"
+import {Search, Filter, ChevronLeft, ChevronRight, Check, X} from "lucide-react"
+import {useTranslations} from "next-intl"
+import {mockContacts} from "@/lib/mock-data"
+import type {Contact} from "@/lib/mock-data"
+import {ContactDetailPanel} from "@/components/admin/contact-detail-panel"
 
 const PAGE_SIZE = 12
 
 export default function ContactsPage() {
+  const t = useTranslations("contactsPage")
   const [search, setSearch] = useState("")
   const [tagFilter, setTagFilter] = useState<string | null>(null)
   const [page, setPage] = useState(1)
@@ -16,7 +18,7 @@ export default function ContactsPage() {
 
   const allTags = useMemo(() => {
     const tags = new Set<string>()
-    mockContacts.forEach((c) => c.tags.forEach((t) => tags.add(t)))
+    mockContacts.forEach((c) => c.tags.forEach((tag) => tags.add(tag)))
     return Array.from(tags).sort()
   }, [])
 
@@ -42,44 +44,48 @@ export default function ContactsPage() {
 
   return (
     <div className="flex h-full">
-      {/* Main list */}
       <div className={`flex flex-1 flex-col gap-6 p-6 lg:p-8 ${selectedContact ? "hidden lg:flex" : ""}`}>
-        {/* Header */}
         <div className="flex flex-col gap-1">
-          <h1 className="text-2xl font-bold text-foreground">Contacts</h1>
-          <p className="text-sm text-muted-foreground">
-            {filtered.length} contacts total
-          </p>
+          <h1 className="text-2xl font-bold text-foreground">{t("title")}</h1>
+          <p className="text-sm text-muted-foreground">{t("summary", {count: filtered.length})}</p>
         </div>
 
-        {/* Filters bar */}
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground/50" />
             <input
               type="text"
-              placeholder="Search by name, phone, or email..."
+              placeholder={t("searchPlaceholder")}
               value={search}
-              onChange={(e) => { setSearch(e.target.value); setPage(1) }}
+              onChange={(e) => {
+                setSearch(e.target.value)
+                setPage(1)
+              }}
               className="w-full rounded-lg border border-border bg-surface-2 py-2.5 pl-9 pr-4 text-sm text-foreground placeholder:text-muted-foreground/50 transition-all hover:border-primary/40 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30"
             />
           </div>
           <div className="flex items-center gap-2 overflow-x-auto">
             <Filter className="h-4 w-4 flex-shrink-0 text-muted-foreground" />
             <button
-              onClick={() => { setTagFilter(null); setPage(1) }}
+              onClick={() => {
+                setTagFilter(null)
+                setPage(1)
+              }}
               className={`flex-shrink-0 rounded-full px-3 py-1 text-xs font-medium transition-colors ${
                 !tagFilter
                   ? "bg-primary/15 text-primary"
                   : "bg-surface-2 text-muted-foreground hover:text-foreground"
               }`}
             >
-              All
+              {t("all")}
             </button>
             {allTags.map((tag) => (
               <button
                 key={tag}
-                onClick={() => { setTagFilter(tag === tagFilter ? null : tag); setPage(1) }}
+                onClick={() => {
+                  setTagFilter(tag === tagFilter ? null : tag)
+                  setPage(1)
+                }}
                 className={`flex-shrink-0 rounded-full px-3 py-1 text-xs font-medium transition-colors ${
                   tag === tagFilter
                     ? "bg-primary/15 text-primary"
@@ -92,17 +98,16 @@ export default function ContactsPage() {
           </div>
         </div>
 
-        {/* Table */}
         <div className="overflow-x-auto rounded-xl border border-border/50">
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-border/50 bg-surface-1">
-                <th className="px-4 py-3 text-left font-medium text-muted-foreground">Name</th>
-                <th className="hidden px-4 py-3 text-left font-medium text-muted-foreground md:table-cell">Phone</th>
-                <th className="hidden px-4 py-3 text-left font-medium text-muted-foreground lg:table-cell">Email</th>
-                <th className="hidden px-4 py-3 text-left font-medium text-muted-foreground sm:table-cell">Tags</th>
-                <th className="px-4 py-3 text-center font-medium text-muted-foreground">Consent</th>
-                <th className="hidden px-4 py-3 text-left font-medium text-muted-foreground md:table-cell">Last Visit</th>
+                <th className="px-4 py-3 text-left font-medium text-muted-foreground">{t("headerName")}</th>
+                <th className="hidden px-4 py-3 text-left font-medium text-muted-foreground md:table-cell">{t("headerPhone")}</th>
+                <th className="hidden px-4 py-3 text-left font-medium text-muted-foreground lg:table-cell">{t("headerEmail")}</th>
+                <th className="hidden px-4 py-3 text-left font-medium text-muted-foreground sm:table-cell">{t("headerTags")}</th>
+                <th className="px-4 py-3 text-center font-medium text-muted-foreground">{t("headerConsent")}</th>
+                <th className="hidden px-4 py-3 text-left font-medium text-muted-foreground md:table-cell">{t("headerLastVisit")}</th>
               </tr>
             </thead>
             <tbody>
@@ -127,9 +132,9 @@ export default function ContactsPage() {
                   <td className="hidden px-4 py-3 text-muted-foreground lg:table-cell">{c.email}</td>
                   <td className="hidden px-4 py-3 sm:table-cell">
                     <div className="flex flex-wrap gap-1">
-                      {c.tags.slice(0, 2).map((t) => (
-                        <span key={t} className="rounded-full bg-surface-2 px-2 py-0.5 text-xs text-muted-foreground">
-                          {t}
+                      {c.tags.slice(0, 2).map((tag) => (
+                        <span key={tag} className="rounded-full bg-surface-2 px-2 py-0.5 text-xs text-muted-foreground">
+                          {tag}
                         </span>
                       ))}
                       {c.tags.length > 2 && (
@@ -141,10 +146,16 @@ export default function ContactsPage() {
                   </td>
                   <td className="px-4 py-3">
                     <div className="flex items-center justify-center gap-2">
-                      <div title="Email" className={`flex h-5 w-5 items-center justify-center rounded-full ${c.emailOptIn ? "bg-emerald-500/15 text-emerald-400" : "bg-red-500/15 text-red-400"}`}>
+                      <div
+                        title={t("tooltipEmail")}
+                        className={`flex h-5 w-5 items-center justify-center rounded-full ${c.emailOptIn ? "bg-emerald-500/15 text-emerald-400" : "bg-red-500/15 text-red-400"}`}
+                      >
                         {c.emailOptIn ? <Check className="h-3 w-3" /> : <X className="h-3 w-3" />}
                       </div>
-                      <div title="SMS" className={`flex h-5 w-5 items-center justify-center rounded-full ${c.smsOptIn ? "bg-emerald-500/15 text-emerald-400" : "bg-red-500/15 text-red-400"}`}>
+                      <div
+                        title={t("tooltipSms")}
+                        className={`flex h-5 w-5 items-center justify-center rounded-full ${c.smsOptIn ? "bg-emerald-500/15 text-emerald-400" : "bg-red-500/15 text-red-400"}`}
+                      >
                         {c.smsOptIn ? <Check className="h-3 w-3" /> : <X className="h-3 w-3" />}
                       </div>
                     </div>
@@ -158,11 +169,8 @@ export default function ContactsPage() {
           </table>
         </div>
 
-        {/* Pagination */}
         <div className="flex items-center justify-between">
-          <p className="text-sm text-muted-foreground">
-            Page {page} of {totalPages}
-          </p>
+          <p className="text-sm text-muted-foreground">{t("page", {page, total: totalPages})}</p>
           <div className="flex items-center gap-2">
             <button
               onClick={() => setPage(Math.max(1, page - 1))}
@@ -182,7 +190,6 @@ export default function ContactsPage() {
         </div>
       </div>
 
-      {/* Detail panel */}
       {selectedContact && (
         <ContactDetailPanel
           contact={selectedContact}

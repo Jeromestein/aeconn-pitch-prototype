@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import { RotateCcw } from "lucide-react"
+import {useTranslations} from "next-intl"
 
 interface KioskFormProps {
   onSuccess: () => void
@@ -24,6 +25,7 @@ interface FormErrors {
 }
 
 export function KioskForm({ onSuccess, onReset }: KioskFormProps) {
+  const t = useTranslations("kioskForm")
   const [form, setForm] = useState<FormData>({
     name: "",
     phone: "",
@@ -36,27 +38,27 @@ export function KioskForm({ onSuccess, onReset }: KioskFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   const interestOptions = [
-    { value: "design", label: "Design Consultation" },
-    { value: "product", label: "Product Demo" },
-    { value: "partner", label: "Partnership" },
-    { value: "other", label: "Other" },
+    { value: "design", label: t("interestDesign") },
+    { value: "product", label: t("interestProduct") },
+    { value: "partner", label: t("interestPartner") },
+    { value: "other", label: t("interestOther") },
   ]
 
   const validate = (): boolean => {
     const newErrors: FormErrors = {}
 
     if (!form.name.trim()) {
-      newErrors.name = "Please enter your name"
+      newErrors.name = t("errors.nameRequired")
     }
 
     if (!form.phone.trim()) {
-      newErrors.phone = "Please enter your phone number"
+      newErrors.phone = t("errors.phoneRequired")
     } else if (!/^[\d+\-\s()]{7,15}$/.test(form.phone)) {
-      newErrors.phone = "Invalid phone number format"
+      newErrors.phone = t("errors.phoneInvalid")
     }
 
     if (form.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
-      newErrors.email = "Invalid email format"
+      newErrors.email = t("errors.emailInvalid")
     }
 
     setErrors(newErrors)
@@ -82,10 +84,10 @@ export function KioskForm({ onSuccess, onReset }: KioskFormProps) {
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-semibold text-foreground">
-            Check-in
+            {t("title")}
           </h2>
           <p className="mt-1 text-sm text-muted-foreground">
-            Please fill in your information
+            {t("subtitle")}
           </p>
         </div>
         <button
@@ -93,7 +95,7 @@ export function KioskForm({ onSuccess, onReset }: KioskFormProps) {
           className="flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm text-muted-foreground transition-colors hover:bg-surface-2 hover:text-foreground"
         >
           <RotateCcw className="h-4 w-4" />
-          Reset
+          {t("reset")}
         </button>
       </div>
 
@@ -102,11 +104,11 @@ export function KioskForm({ onSuccess, onReset }: KioskFormProps) {
         {/* Name */}
         <div className="flex flex-col gap-1.5">
           <label className="text-sm font-medium text-foreground">
-            Name <span className="text-primary">*</span>
+            {t("name")} <span className="text-primary">{t("required")}</span>
           </label>
           <input
             type="text"
-            placeholder="Enter your full name"
+            placeholder={t("namePlaceholder")}
             value={form.name}
             onChange={(e) => {
               setForm({ ...form, name: e.target.value })
@@ -122,11 +124,11 @@ export function KioskForm({ onSuccess, onReset }: KioskFormProps) {
         {/* Phone */}
         <div className="flex flex-col gap-1.5">
           <label className="text-sm font-medium text-foreground">
-            Phone <span className="text-primary">*</span>
+            {t("phone")} <span className="text-primary">{t("required")}</span>
           </label>
           <input
             type="tel"
-            placeholder="138 0000 0000"
+            placeholder={t("phonePlaceholder")}
             value={form.phone}
             onChange={(e) => {
               setForm({ ...form, phone: e.target.value })
@@ -142,11 +144,11 @@ export function KioskForm({ onSuccess, onReset }: KioskFormProps) {
         {/* Email */}
         <div className="flex flex-col gap-1.5">
           <label className="text-sm font-medium text-foreground">
-            Email
+            {t("email")}
           </label>
           <input
             type="email"
-            placeholder="your@email.com"
+            placeholder={t("emailPlaceholder")}
             value={form.email}
             onChange={(e) => {
               setForm({ ...form, email: e.target.value })
@@ -162,7 +164,7 @@ export function KioskForm({ onSuccess, onReset }: KioskFormProps) {
         {/* Interest */}
         <div className="flex flex-col gap-1.5">
           <label className="text-sm font-medium text-foreground">
-            Interest
+            {t("interest")}
           </label>
           <div className="grid grid-cols-2 gap-2">
             {interestOptions.map((opt) => (
@@ -184,7 +186,7 @@ export function KioskForm({ onSuccess, onReset }: KioskFormProps) {
         {/* Consent */}
         <div className="flex flex-col gap-3 rounded-lg border border-border/50 bg-surface-1 p-4">
           <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-            Communication Preferences
+            {t("prefsTitle")}
           </p>
           <label className="flex cursor-pointer items-center gap-3">
             <div
@@ -202,7 +204,7 @@ export function KioskForm({ onSuccess, onReset }: KioskFormProps) {
               )}
             </div>
             <span className="text-sm text-foreground">
-              Agree to receive email notifications
+              {t("emailOptIn")}
             </span>
           </label>
           <label className="flex cursor-pointer items-center gap-3">
@@ -221,7 +223,7 @@ export function KioskForm({ onSuccess, onReset }: KioskFormProps) {
               )}
             </div>
             <span className="text-sm text-foreground">
-              Agree to receive SMS notifications
+              {t("smsOptIn")}
             </span>
           </label>
         </div>
@@ -239,10 +241,10 @@ export function KioskForm({ onSuccess, onReset }: KioskFormProps) {
               <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" className="opacity-25" />
               <path d="M4 12a8 8 0 018-8" stroke="currentColor" strokeWidth="3" strokeLinecap="round" className="opacity-75" />
             </svg>
-            Submitting...
+            {t("submitting")}
           </span>
         ) : (
-          "Submit Check-in"
+          t("submit")
         )}
       </button>
     </div>
