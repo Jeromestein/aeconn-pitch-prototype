@@ -24,6 +24,13 @@
     "interestProduct": "Investment",
     "interestPartner": "Loan",
     "interestOther": "Other",
+    "office": "Office",
+    "officePlaceholder": "Select an office",
+    "officeIrvine": "Irvine Office",
+    "officeLasVegas": "Las Vegas Office",
+    "officeAnaheim": "Anaheim Office",
+    "officeDallas": "Dallas Office",
+    "officeHongKong": "Hong Kong Office",
     "prefsTitle": "Communication Preferences",
     "emailOptIn": "Agree to receive email notifications",
     "smsOptIn": "Agree to receive SMS notifications",
@@ -49,14 +56,25 @@
     "statsCheckins": "Check-ins",
     "statsConsent": "Consent Rate",
     "signInTitle": "Sign in to Admin",
-    "signInSubtitle": "Enter your email for a magic login link",
+    "signInSubtitle": "Enter your admin email to receive a 6-digit verification code",
     "emailLabel": "Email Address",
     "emailPlaceholder": "admin@aeconn.com",
-    "send": "Send Magic Link",
-    "sending": "Sending Magic Link...",
-    "redirecting": "Redirecting to Dashboard...",
-    "sentHint": "Magic link sent! Automatically signing in for demo...",
-    "footer": "Demo mode - click Sign In to enter the dashboard"
+    "otpLabel": "Verification Code",
+    "otpPlaceholder": "123456",
+    "send": "Send Verification Code",
+    "sending": "Sending Verification Code...",
+    "verify": "Verify & Continue",
+    "verifying": "Verifying Code...",
+    "otpSentHint": "We sent a 6-digit code to {email}. Enter it below to continue.",
+    "changeEmail": "Use a different email",
+    "footer": "Admin access is restricted to approved emails in Supabase.",
+    "errors": {
+      "emailRequired": "Enter your admin email address.",
+      "config": "Supabase auth is not configured. Add the required environment variables first.",
+      "generic": "Unable to complete sign-in. Verify your admin access and try again.",
+      "invalidOtp": "Enter a valid 6-digit verification code.",
+      "recovery": "The auth service may be waking up. Please wait a moment and try again."
+    }
   },
   "dashboard": {
     "title": "Dashboard",
@@ -125,7 +143,8 @@
     "contacts": "Contacts",
     "visits": "Visits",
     "campaigns": "Campaigns",
-    "signOut": "Sign Out"
+    "signOut": "Sign Out",
+    "signingOut": "Signing Out..."
   },
   "campaignCreateModal": {
     "titleNew": "New Email Campaign",

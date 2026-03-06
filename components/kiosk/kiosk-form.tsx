@@ -14,6 +14,7 @@ interface FormData {
   phone: string
   email: string
   interest: string
+  office: string
   emailOptIn: boolean
   smsOptIn: boolean
 }
@@ -31,6 +32,7 @@ export function KioskForm({ onSuccess, onReset }: KioskFormProps) {
     phone: "",
     email: "",
     interest: "",
+    office: "",
     emailOptIn: true,
     smsOptIn: false,
   })
@@ -42,6 +44,14 @@ export function KioskForm({ onSuccess, onReset }: KioskFormProps) {
     { value: "product", label: t("interestProduct") },
     { value: "partner", label: t("interestPartner") },
     { value: "other", label: t("interestOther") },
+  ]
+
+  const officeOptions = [
+    { value: "irvine", label: t("officeIrvine") },
+    { value: "las-vegas", label: t("officeLasVegas") },
+    { value: "anaheim", label: t("officeAnaheim") },
+    { value: "dallas", label: t("officeDallas") },
+    { value: "hong-kong", label: t("officeHongKong") },
   ]
 
   const validate = (): boolean => {
@@ -181,6 +191,27 @@ export function KioskForm({ onSuccess, onReset }: KioskFormProps) {
               </button>
             ))}
           </div>
+        </div>
+
+        {/* Office */}
+        <div className="flex flex-col gap-1.5">
+          <label className="text-sm font-medium text-foreground">
+            {t("office")}
+          </label>
+          <select
+            value={form.office}
+            onChange={(e) => setForm({ ...form, office: e.target.value })}
+            className={`${inputClasses} appearance-none border-border hover:border-primary/40`}
+          >
+            <option value="">
+              {t("officePlaceholder")}
+            </option>
+            {officeOptions.map((opt) => (
+              <option key={opt.value} value={opt.value}>
+                {opt.label}
+              </option>
+            ))}
+          </select>
         </div>
 
         {/* Consent */}

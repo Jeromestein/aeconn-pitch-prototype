@@ -24,6 +24,13 @@
     "interestProduct": "投资",
     "interestPartner": "贷款",
     "interestOther": "其他",
+    "office": "办公室",
+    "officePlaceholder": "请选择办公室",
+    "officeIrvine": "Irvine 办公室",
+    "officeLasVegas": "Las Vegas 办公室",
+    "officeAnaheim": "Anaheim 办公室",
+    "officeDallas": "Dallas 办公室",
+    "officeHongKong": "Hong Kong 办公室",
     "prefsTitle": "沟通偏好",
     "emailOptIn": "同意接收邮件通知",
     "smsOptIn": "同意接收短信通知",
@@ -49,14 +56,25 @@
     "statsCheckins": "签到数",
     "statsConsent": "同意率",
     "signInTitle": "登录管理后台",
-    "signInSubtitle": "输入邮箱获取魔法登录链接",
+    "signInSubtitle": "输入管理员邮箱，获取 6 位邮箱验证码",
     "emailLabel": "邮箱地址",
     "emailPlaceholder": "admin@aeconn.com",
-    "send": "发送登录链接",
+    "otpLabel": "验证码",
+    "otpPlaceholder": "123456",
+    "send": "发送验证码",
     "sending": "发送中...",
-    "redirecting": "正在跳转到仪表盘...",
-    "sentHint": "链接已发送！演示环境将自动登录。",
-    "footer": "演示模式 - 点击登录进入仪表盘"
+    "verify": "验证并进入后台",
+    "verifying": "验证中...",
+    "otpSentHint": "6 位验证码已发送至 {email}，请输入后继续。",
+    "changeEmail": "更换邮箱",
+    "footer": "只有 Supabase 白名单中的管理员邮箱可以访问后台。",
+    "errors": {
+      "emailRequired": "请输入管理员邮箱地址。",
+      "config": "尚未配置 Supabase 鉴权环境变量。",
+      "generic": "无法完成登录，请确认管理员权限后重试。",
+      "invalidOtp": "请输入有效的 6 位验证码。",
+      "recovery": "鉴权服务可能正在恢复，请稍后再试。"
+    }
   },
   "dashboard": {
     "title": "数据概览",
@@ -125,7 +143,8 @@
     "contacts": "客户管理",
     "visits": "签到流水",
     "campaigns": "营销活动",
-    "signOut": "退出登录"
+    "signOut": "退出登录",
+    "signingOut": "退出中..."
   },
   "campaignCreateModal": {
     "titleNew": "新建邮件活动",
