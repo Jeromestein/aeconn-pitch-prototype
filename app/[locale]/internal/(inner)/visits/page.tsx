@@ -185,7 +185,7 @@ export default function VisitsPage() {
                     <span className="text-xs">{sourceLabel(v.source)}</span>
                   </div>
                 </td>
-                <td className="hidden px-4 py-3 text-muted-foreground md:table-cell">{v.kioskId}</td>
+                <td className="hidden px-4 py-3 text-muted-foreground md:table-cell">{v.office || "—"}</td>
                 <td className="px-4 py-3">
                   <span
                     className={`inline-flex rounded-full px-2.5 py-0.5 text-xs font-medium ${

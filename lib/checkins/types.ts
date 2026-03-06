@@ -14,7 +14,6 @@ export const checkinPayloadSchema = z.object({
   office: z.string().trim().optional().or(z.literal("")),
   emailOptIn: z.boolean(),
   smsOptIn: z.boolean(),
-  kioskId: z.string().trim().optional().or(z.literal("")),
   source: z.enum(CHECKIN_SOURCES).optional(),
 })
 
@@ -25,7 +24,6 @@ export interface CheckinRecord {
   contactId: string
   contactName: string
   checkedInAt: string
-  kioskId: string
   source: CheckinSource
   status: CheckinStatus
   interest: string | null

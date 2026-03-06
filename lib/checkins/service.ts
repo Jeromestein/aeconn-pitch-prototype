@@ -27,7 +27,6 @@ type CheckinRow = {
   contact_id: string
   contact_name: string
   checked_in_at: string
-  kiosk_id: string
   source: "kiosk" | "web" | "manual"
   status: "completed" | "pending" | "cancelled"
   interest: string | null
@@ -72,17 +71,12 @@ function validateNormalizedEmail(email: string | null) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
 }
 
-function getDefaultKioskId() {
-  return process.env.NEXT_PUBLIC_KIOSK_ID?.trim() || "KIOSK-1"
-}
-
 function toCheckinRecord(row: CheckinRow): CheckinRecord {
   return {
     id: row.id,
     contactId: row.contact_id,
     contactName: row.contact_name,
     checkedInAt: row.checked_in_at,
-    kioskId: row.kiosk_id,
     source: row.source,
     status: row.status,
     interest: normalizeInterestValue(row.interest),
@@ -228,7 +222,6 @@ export function parseCheckinPayload(input: unknown) {
       office: normalizeOptionalValue(payload.office),
       emailOptIn: payload.emailOptIn,
       smsOptIn: payload.smsOptIn,
-      kioskId: normalizeOptionalValue(payload.kioskId) || getDefaultKioskId(),
       source: payload.source || "kiosk",
     },
   }
@@ -310,7 +303,7 @@ export async function upsertContactAndCreateCheckin(input: unknown) {
       contact_id: contactRow.id,
       contact_name: normalizedInput.name,
       checked_in_at: now,
-      kiosk_id: normalizedInput.kioskId,
+      kiosk_id: normalizedInput.office || "office-unknown",
       source: normalizedInput.source,
       status: "completed",
       interest: normalizedInput.interest,

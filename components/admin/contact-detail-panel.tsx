@@ -108,7 +108,7 @@ export function ContactDetailPanel({ contact, onClose }: ContactDetailPanelProps
               contactVisits.map((v) => (
                 <div key={v.id} className="flex items-center justify-between rounded-lg bg-background p-3">
                   <div>
-                    <p className="text-sm text-foreground">{v.kioskId}</p>
+                    <p className="text-sm text-foreground">{v.office || t("emptyValue")}</p>
                     <p className="text-xs text-muted-foreground">{formatDate(v.checkedInAt)}</p>
                   </div>
                   <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${
