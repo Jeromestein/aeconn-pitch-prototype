@@ -1,5 +1,6 @@
 "use client"
 
+import Image from "next/image"
 import {useTranslations} from "next-intl"
 
 interface KioskWelcomeProps {
@@ -12,13 +13,15 @@ export function KioskWelcome({ onStart }: KioskWelcomeProps) {
   return (
     <div className="flex flex-col items-center gap-10 text-center">
       {/* Brand */}
-      <div className="flex flex-col items-center gap-4">
-        <div className="flex h-20 w-20 items-center justify-center rounded-2xl border border-primary/30 bg-surface-1 shadow-[0_0_60px_rgba(201,168,76,0.12)]">
-          <span className="text-4xl font-bold text-primary">A</span>
-        </div>
-        <h1 className="text-4xl font-bold tracking-tight text-foreground">
-          Aeconn
-        </h1>
+      <div className="flex flex-col items-center gap-2">
+        <Image
+          src="/Aeconn_logo.png"
+          alt="Aeconn"
+          width={600}
+          height={160}
+          priority
+          className="h-auto w-[260px] max-w-full sm:w-[320px]"
+        />
       </div>
 
       {/* Welcome text */}

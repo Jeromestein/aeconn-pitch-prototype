@@ -1,5 +1,6 @@
 "use client"
 
+import Image from "next/image"
 import { useState } from "react"
 import { Mail, ArrowRight, Sparkles, ShieldCheck } from "lucide-react"
 import { useTranslations } from "next-intl"
@@ -11,7 +12,7 @@ import { normalizeAdminEmail } from "@/lib/auth/shared"
 type LoginStep = "email" | "otp"
 
 function isValidOtp(value: string) {
-  return /^\d{6}$/.test(value)
+  return /^\d{6,8}$/.test(value)
 }
 
 export function AdminLoginForm() {
@@ -59,7 +60,7 @@ export function AdminLoginForm() {
       const { error } = await supabase.auth.signInWithOtp({
         email: normalizedEmail,
         options: {
-          shouldCreateUser: true,
+          shouldCreateUser: false,
         },
       })
 
@@ -147,11 +148,15 @@ export function AdminLoginForm() {
           />
         </div>
 
-        <div className="relative z-10 flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-lg border border-primary/30 bg-background">
-            <span className="text-xl font-bold text-primary">A</span>
-          </div>
-          <span className="text-xl font-semibold text-foreground">Aeconn</span>
+        <div className="relative z-10">
+          <Image
+            src="/Aeconn_logo.png"
+            alt="Aeconn"
+            width={600}
+            height={160}
+            priority
+            className="h-auto w-[180px]"
+          />
         </div>
 
         <div className="relative z-10 flex flex-col gap-6">
@@ -184,11 +189,15 @@ export function AdminLoginForm() {
 
       <div className="flex flex-1 flex-col items-center justify-center bg-background px-6 py-12">
         <div className="w-full max-w-sm">
-          <div className="mb-12 flex items-center gap-3 lg:hidden">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg border border-primary/30 bg-surface-1">
-              <span className="text-xl font-bold text-primary">A</span>
-            </div>
-            <span className="text-xl font-semibold text-foreground">Aeconn</span>
+          <div className="mb-12 lg:hidden">
+            <Image
+              src="/Aeconn_logo.png"
+              alt="Aeconn"
+              width={600}
+              height={160}
+              priority
+              className="h-auto w-[180px]"
+            />
           </div>
 
           <div className="flex flex-col gap-2">
@@ -219,7 +228,7 @@ export function AdminLoginForm() {
                   <input
                     type="text"
                     inputMode="numeric"
-                    maxLength={6}
+                    maxLength={8}
                     placeholder={t("otpPlaceholder")}
                     value={otp}
                     onChange={(event) => setOtp(event.target.value.replace(/\D/g, ""))}
