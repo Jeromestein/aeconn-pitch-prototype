@@ -54,7 +54,7 @@
   },
   "consoleLogin": {
     "heroTitle": "Transform Check-in Data Into Marketing Assets",
-    "heroSubtitle": "Manage your customers, track visits, and run marketing campaigns from one unified platform.",
+    "heroSubtitle": "Manage your customers and track visits from one unified platform.",
     "statsCustomers": "Customers",
     "statsCheckins": "Check-ins",
     "statsConsent": "Consent Rate",
@@ -81,11 +81,11 @@
   },
   "dashboard": {
     "title": "Dashboard",
-    "subtitle": "Overview of your check-in and marketing data",
+    "subtitle": "Overview of your check-in and customer data",
     "metricTodayCheckins": "Today Check-ins",
     "metricTotalContacts": "Total Contacts",
     "metricConsentRate": "Consent Rate",
-    "metricAvgCheckin": "Avg Check-in",
+    "metricSmsOptInContacts": "SMS Opt-In Users",
     "loading": "Loading live data...",
     "errors": {
       "config": "Supabase is not configured, so the dashboard is unavailable.",

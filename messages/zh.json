@@ -54,7 +54,7 @@
   },
   "consoleLogin": {
     "heroTitle": "将签到数据转化为营销资产",
-    "heroSubtitle": "在同一平台统一管理客户、追踪来访并执行营销活动。",
+    "heroSubtitle": "在同一平台统一管理客户并追踪来访记录。",
     "statsCustomers": "客户数",
     "statsCheckins": "签到数",
     "statsConsent": "同意率",
@@ -81,11 +81,11 @@
   },
   "dashboard": {
     "title": "数据概览",
-    "subtitle": "查看签到与营销数据总览",
+    "subtitle": "查看签到与客户数据总览",
     "metricTodayCheckins": "今日签到",
     "metricTotalContacts": "总客户数",
     "metricConsentRate": "同意率",
-    "metricAvgCheckin": "平均签到耗时",
+    "metricSmsOptInContacts": "同意接收短信用户",
     "loading": "正在加载真实数据...",
     "errors": {
       "config": "尚未配置 Supabase，无法加载仪表盘。",

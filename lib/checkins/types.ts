@@ -52,7 +52,7 @@ export interface DashboardMetricsRecord {
   todayCheckins: number
   totalContacts: number
   consentRate: number
-  avgCheckinTime: string | null
+  smsOptInContacts: number
   weeklyTrend: { day: string; checkins: number; newContacts: number }[]
   monthlyTrend: { date: string; checkins: number }[]
   topTags: { tag: string; count: number }[]

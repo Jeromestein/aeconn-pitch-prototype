@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import {Users, ClipboardCheck, ShieldCheck, Timer} from "lucide-react"
+import {Users, ClipboardCheck, ShieldCheck, MessageSquareText} from "lucide-react"
 import {useTranslations} from "next-intl"
 import {DashboardTrendChart} from "@/components/admin/dashboard-trend-chart"
 import {DashboardBarChart} from "@/components/admin/dashboard-bar-chart"
@@ -77,9 +77,9 @@ export default function DashboardPage() {
       icon: ShieldCheck,
     },
     {
-      label: t("metricAvgCheckin"),
-      value: dashboard.avgCheckinTime ?? "—",
-      icon: Timer,
+      label: t("metricSmsOptInContacts"),
+      value: dashboard.smsOptInContacts,
+      icon: MessageSquareText,
     },
   ] : []
 

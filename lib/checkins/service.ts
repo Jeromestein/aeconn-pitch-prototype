@@ -377,6 +377,7 @@ export async function getDashboardMetrics(): Promise<DashboardMetricsRecord> {
 
   const todayCheckins = checkins.filter((item) => getIsoDayKey(item.checkedInAt) === todayKey)
   const consentedContacts = contacts.filter((item) => item.emailOptIn || item.smsOptIn)
+  const smsOptInContacts = contacts.filter((item) => item.smsOptIn)
   const monthlyTrend = []
 
   for (let offset = 29; offset >= 0; offset -= 1) {
@@ -425,7 +426,7 @@ export async function getDashboardMetrics(): Promise<DashboardMetricsRecord> {
     todayCheckins: todayCheckins.length,
     totalContacts: contacts.length,
     consentRate: contacts.length === 0 ? 0 : Math.round((consentedContacts.length / contacts.length) * 1000) / 10,
-    avgCheckinTime: null,
+    smsOptInContacts: smsOptInContacts.length,
     weeklyTrend,
     monthlyTrend,
     topTags,

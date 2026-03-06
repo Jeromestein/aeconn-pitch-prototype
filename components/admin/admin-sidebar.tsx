@@ -6,7 +6,6 @@ import {
   LayoutDashboard,
   Users,
   ClipboardList,
-  Megaphone,
   ChevronLeft,
   Menu,
 } from "lucide-react"
@@ -21,7 +20,6 @@ const navItems = [
   {href: DASHBOARD_PATH, labelKey: "dashboard", icon: LayoutDashboard},
   {href: `${ADMIN_BASE_PATH}/contacts`, labelKey: "contacts", icon: Users},
   {href: `${ADMIN_BASE_PATH}/visits`, labelKey: "visits", icon: ClipboardList},
-  {href: `${ADMIN_BASE_PATH}/campaigns`, labelKey: "campaigns", icon: Megaphone},
 ] as const
 
 export function AdminSidebar() {
