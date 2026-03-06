@@ -1,5 +1,6 @@
 "use client"
 
+import Image from "next/image"
 import {Link, usePathname} from "@/i18n/navigation"
 import {
   LayoutDashboard,
@@ -38,16 +39,26 @@ export function AdminSidebar() {
       <div className="flex h-16 items-center justify-between border-b border-border/50 px-4">
         {!collapsed && (
           <Link href={DASHBOARD_PATH} className="flex items-center gap-2.5">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg border border-primary/30 bg-background">
-              <span className="text-base font-bold text-primary">A</span>
-            </div>
+            <Image
+              src="/Aeconn_icon.png"
+              alt="Aeconn"
+              width={219}
+              height={150}
+              priority
+              className="h-8 w-8 object-contain"
+            />
             <span className="text-base font-semibold text-foreground">Aeconn</span>
           </Link>
         )}
         {collapsed && (
-          <div className="mx-auto flex h-8 w-8 items-center justify-center rounded-lg border border-primary/30 bg-background">
-            <span className="text-base font-bold text-primary">A</span>
-          </div>
+          <Image
+            src="/Aeconn_icon.png"
+            alt="Aeconn"
+            width={219}
+            height={150}
+            priority
+            className="mx-auto h-8 w-8 object-contain"
+          />
         )}
         <button
           onClick={() => setCollapsed(!collapsed)}
