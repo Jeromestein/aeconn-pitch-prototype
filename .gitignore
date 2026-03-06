@@ -8,8 +8,8 @@ node_modules/
 .next/
 .env*.local
 .DS_Store
+tsconfig.tsbuildinfo
 
 # Playwright
 output/playwright/
 .playwright-cli/
-
