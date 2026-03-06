@@ -13,7 +13,7 @@ import {
 import {useState} from "react"
 import {useTranslations} from "next-intl"
 
-const ADMIN_BASE_PATH = "/internal/console"
+const ADMIN_BASE_PATH = "/internal"
 const DASHBOARD_PATH = `${ADMIN_BASE_PATH}/dashboard`
 
 const navItems = [
