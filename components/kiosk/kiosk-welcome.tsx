@@ -11,9 +11,6 @@ export function KioskWelcome({ onStart }: KioskWelcomeProps) {
 
   return (
     <div className="flex flex-col items-center gap-10 text-center">
-      {/* Decorative top line */}
-      <div className="h-px w-24 bg-primary/40" />
-
       {/* Brand */}
       <div className="flex flex-col items-center gap-4">
         <div className="flex h-20 w-20 items-center justify-center rounded-2xl border border-primary/30 bg-surface-1 shadow-[0_0_60px_rgba(201,168,76,0.12)]">
@@ -46,9 +43,6 @@ export function KioskWelcome({ onStart }: KioskWelcomeProps) {
       <p className="text-sm text-muted-foreground/60">
         {t("hint")}
       </p>
-
-      {/* Decorative bottom line */}
-      <div className="h-px w-24 bg-primary/40" />
     </div>
   )
 }
