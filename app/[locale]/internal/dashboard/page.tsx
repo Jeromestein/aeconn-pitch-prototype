@@ -1,48 +1,90 @@
 "use client"
 
-import {TrendingUp, TrendingDown, Users, ClipboardCheck, ShieldCheck, Timer} from "lucide-react"
+import { useEffect, useState } from "react"
+import {Users, ClipboardCheck, ShieldCheck, Timer} from "lucide-react"
 import {useTranslations} from "next-intl"
-import {mockDashboard} from "@/lib/mock-data"
 import {DashboardTrendChart} from "@/components/admin/dashboard-trend-chart"
 import {DashboardBarChart} from "@/components/admin/dashboard-bar-chart"
 import {DashboardPieChart} from "@/components/admin/dashboard-pie-chart"
 import {DashboardHourlyChart} from "@/components/admin/dashboard-hourly-chart"
+import type { DashboardMetricsRecord } from "@/lib/checkins/types"
 
 export default function DashboardPage() {
   const t = useTranslations("dashboard")
+  const [dashboard, setDashboard] = useState<DashboardMetricsRecord | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
-  const metrics = [
+  useEffect(() => {
+    let cancelled = false
+
+    async function loadDashboard() {
+      setLoading(true)
+      setError(null)
+
+      try {
+        const response = await fetch("/api/internal/dashboard", { cache: "no-store" })
+        const result = await response.json().catch(() => null)
+
+        if (!response.ok) {
+          throw new Error(result?.error || "DASHBOARD_FETCH_FAILED")
+        }
+
+        if (!cancelled) {
+          setDashboard(result?.dashboard || null)
+        }
+      } catch (fetchError) {
+        if (!cancelled) {
+          const errorCode = fetchError instanceof Error ? fetchError.message : "DASHBOARD_FETCH_FAILED"
+          setError(
+            errorCode === "SUPABASE_NOT_CONFIGURED"
+              ? t("errors.config")
+              : errorCode === "SUPABASE_SCHEMA_MISSING"
+                ? t("errors.schema")
+              : t("errors.generic")
+          )
+        }
+      } finally {
+        if (!cancelled) {
+          setLoading(false)
+        }
+      }
+    }
+
+    void loadDashboard()
+
+    return () => {
+      cancelled = true
+    }
+  }, [t])
+
+  const metrics = dashboard ? [
     {
       label: t("metricTodayCheckins"),
-      value: mockDashboard.todayCheckins,
-      delta: mockDashboard.todayCheckinsDelta,
+      value: dashboard.todayCheckins,
       icon: ClipboardCheck,
     },
     {
       label: t("metricTotalContacts"),
-      value: mockDashboard.totalContacts,
-      delta: mockDashboard.totalContactsDelta,
+      value: dashboard.totalContacts,
       icon: Users,
     },
     {
       label: t("metricConsentRate"),
-      value: `${mockDashboard.consentRate}%`,
-      delta: mockDashboard.consentRateDelta,
+      value: `${dashboard.consentRate}%`,
       icon: ShieldCheck,
     },
     {
       label: t("metricAvgCheckin"),
-      value: mockDashboard.avgCheckinTime,
-      delta: -2.1,
+      value: dashboard.avgCheckinTime ?? "—",
       icon: Timer,
-      invertDelta: true,
     },
-  ]
+  ] : []
 
-  const weeklyTrendData = mockDashboard.weeklyTrend.map((item, index) => ({
+  const weeklyTrendData = dashboard?.weeklyTrend.map((item, index) => ({
     ...item,
     day: t(`weekday${index}`),
-  }))
+  })) || []
 
   return (
     <div className="flex flex-col gap-6 p-6 lg:p-8">
@@ -51,9 +93,20 @@ export default function DashboardPage() {
         <p className="text-sm text-muted-foreground">{t("subtitle")}</p>
       </div>
 
+      {loading ? (
+        <div className="rounded-xl border border-border/50 bg-card p-6 text-sm text-muted-foreground">
+          {t("loading")}
+        </div>
+      ) : null}
+
+      {error ? (
+        <div className="rounded-xl border border-destructive/40 bg-destructive/10 p-6 text-sm text-destructive">
+          {error}
+        </div>
+      ) : null}
+
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
         {metrics.map((m) => {
-          const isPositive = m.invertDelta ? m.delta < 0 : m.delta > 0
           return (
             <div
               key={m.label}
@@ -67,20 +120,8 @@ export default function DashboardPage() {
                   <m.icon className="h-4 w-4" />
                 </div>
               </div>
-              <div className="mt-3 flex items-end justify-between">
+              <div className="mt-3">
                 <p className="text-3xl font-bold text-foreground">{m.value}</p>
-                <div
-                  className={`flex items-center gap-0.5 text-sm font-medium ${
-                    isPositive ? "text-emerald-400" : "text-red-400"
-                  }`}
-                >
-                  {isPositive ? (
-                    <TrendingUp className="h-3.5 w-3.5" />
-                  ) : (
-                    <TrendingDown className="h-3.5 w-3.5" />
-                  )}
-                  {Math.abs(m.delta)}%
-                </div>
               </div>
             </div>
           )
@@ -89,16 +130,16 @@ export default function DashboardPage() {
 
       <div className="grid grid-cols-1 gap-4 xl:grid-cols-3">
         <div className="xl:col-span-2">
-          <DashboardTrendChart data={mockDashboard.monthlyTrend} />
+          <DashboardTrendChart data={dashboard?.monthlyTrend || []} />
         </div>
         <div>
-          <DashboardPieChart data={mockDashboard.topTags} />
+          <DashboardPieChart data={dashboard?.topTags || []} />
         </div>
       </div>
 
       <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
         <DashboardBarChart data={weeklyTrendData} />
-        <DashboardHourlyChart data={mockDashboard.hourlyDistribution} />
+        <DashboardHourlyChart data={dashboard?.hourlyDistribution || []} />
       </div>
     </div>
   )

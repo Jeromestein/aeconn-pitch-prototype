@@ -40,7 +40,10 @@
       "nameRequired": "Please enter your name",
       "phoneRequired": "Please enter your phone number",
       "phoneInvalid": "Invalid phone number format",
-      "emailInvalid": "Invalid email format"
+      "emailInvalid": "Invalid email format",
+      "config": "Supabase is not configured, so check-in is unavailable.",
+      "schema": "Supabase tables are not initialized yet. Run the SQL script first.",
+      "submitFailed": "Check-in failed. Please try again."
     }
   },
   "kioskSuccess": {
@@ -83,6 +86,12 @@
     "metricTotalContacts": "Total Contacts",
     "metricConsentRate": "Consent Rate",
     "metricAvgCheckin": "Avg Check-in",
+    "loading": "Loading live data...",
+    "errors": {
+      "config": "Supabase is not configured, so the dashboard is unavailable.",
+      "schema": "Supabase tables are not initialized, so the dashboard is unavailable.",
+      "generic": "Unable to load the dashboard right now."
+    },
     "weekday0": "Mon",
     "weekday1": "Tue",
     "weekday2": "Wed",
@@ -99,12 +108,19 @@
     "headerName": "Name",
     "headerPhone": "Phone",
     "headerEmail": "Email",
-    "headerTags": "Tags",
+    "headerInterest": "Interest",
     "headerConsent": "Consent",
     "headerLastVisit": "Last Visit",
     "tooltipEmail": "Email",
     "tooltipSms": "SMS",
-    "page": "Page {page} of {total}"
+    "page": "Page {page} of {total}",
+    "loading": "Loading contacts...",
+    "empty": "No contacts found",
+    "errors": {
+      "config": "Supabase is not configured, so contacts cannot be loaded.",
+      "schema": "Supabase tables are not initialized, so contacts cannot be loaded.",
+      "generic": "Unable to load contacts right now."
+    }
   },
   "visitsPage": {
     "title": "Visit Records",
@@ -126,7 +142,14 @@
     "statusCompleted": "Completed",
     "statusPending": "Pending",
     "statusCancelled": "Cancelled",
-    "page": "Page {page} of {total}"
+    "page": "Page {page} of {total}",
+    "loading": "Loading check-ins...",
+    "empty": "No check-ins found",
+    "errors": {
+      "config": "Supabase is not configured, so check-ins cannot be loaded.",
+      "schema": "Supabase tables are not initialized, so check-ins cannot be loaded.",
+      "generic": "Unable to load check-ins right now."
+    }
   },
   "campaignsPage": {
     "title": "Campaigns",
@@ -190,11 +213,8 @@
   },
   "contactDetailPanel": {
     "title": "Contact Details",
-    "langChinese": "Chinese",
-    "langEnglish": "English",
     "created": "Created: {value}",
     "visits": "Visits: {count}",
-    "tags": "Tags",
     "consent": "Consent Status",
     "emailNotifications": "Email Notifications",
     "smsNotifications": "SMS Notifications",
@@ -202,6 +222,7 @@
     "optedOut": "Opted Out",
     "recentVisits": "Recent Visits",
     "noVisits": "No visits recorded",
+    "emptyValue": "Not provided",
     "statusCompleted": "Completed",
     "statusPending": "Pending",
     "statusCancelled": "Cancelled"
@@ -215,8 +236,8 @@
     "barSubtitle": "Check-ins vs new contacts this week",
     "barCheckins": "Check-ins",
     "barNewContacts": "New Contacts",
-    "pieTitle": "Tag Distribution",
-    "pieSubtitle": "Customer tag breakdown",
+    "pieTitle": "Interest Distribution",
+    "pieSubtitle": "Customer interest breakdown",
     "hourlyTitle": "Hourly Distribution",
     "hourlySubtitle": "Check-in volume by hour today",
     "hourlyCheckins": "Check-ins"

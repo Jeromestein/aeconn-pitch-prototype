@@ -38,6 +38,7 @@ export function KioskForm({ onSuccess, onReset }: KioskFormProps) {
   })
   const [errors, setErrors] = useState<FormErrors>({})
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [submitError, setSubmitError] = useState<string | null>(null)
 
   const interestOptions = [
     { value: "design", label: t("interestDesign") },
@@ -79,10 +80,36 @@ export function KioskForm({ onSuccess, onReset }: KioskFormProps) {
     if (!validate()) return
 
     setIsSubmitting(true)
-    // Mock submit delay
-    await new Promise((resolve) => setTimeout(resolve, 1200))
-    setIsSubmitting(false)
-    onSuccess()
+    setSubmitError(null)
+
+    try {
+      const response = await fetch("/api/checkins", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(form),
+      })
+
+      const result = await response.json().catch(() => null)
+      if (!response.ok) {
+        const errorCode = result?.error as string | undefined
+        if (errorCode === "SUPABASE_NOT_CONFIGURED") {
+          setSubmitError(t("errors.config"))
+        } else if (errorCode === "SUPABASE_SCHEMA_MISSING") {
+          setSubmitError(t("errors.schema"))
+        } else {
+          setSubmitError(result?.message || t("errors.submitFailed"))
+        }
+        return
+      }
+
+      onSuccess()
+    } catch {
+      setSubmitError(t("errors.submitFailed"))
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   const inputClasses =
@@ -261,6 +288,11 @@ export function KioskForm({ onSuccess, onReset }: KioskFormProps) {
       </div>
 
       {/* Submit */}
+      {submitError && (
+        <div className="rounded-lg border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive">
+          {submitError}
+        </div>
+      )}
       <button
         onClick={handleSubmit}
         disabled={isSubmitting}

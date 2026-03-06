@@ -1,20 +1,17 @@
 "use client"
 
-import { X, Mail, Phone, Globe, Calendar, Tag, ShieldCheck, Clock } from "lucide-react"
+import { X, Mail, Phone, Calendar, ShieldCheck, Clock, Building2, Briefcase } from "lucide-react"
 import {useTranslations} from "next-intl"
-import type { Contact } from "@/lib/mock-data"
-import { mockVisits } from "@/lib/mock-data"
+import type { ContactRecord } from "@/lib/checkins/types"
 
 interface ContactDetailPanelProps {
-  contact: Contact
+  contact: ContactRecord
   onClose: () => void
 }
 
 export function ContactDetailPanel({ contact, onClose }: ContactDetailPanelProps) {
   const t = useTranslations("contactDetailPanel")
-  const contactVisits = mockVisits
-    .filter((v) => v.contactId === contact.id)
-    .slice(0, 5)
+  const contactVisits = contact.recentCheckins
 
   const formatDate = (iso: string) => {
     const d = new Date(iso)
@@ -54,11 +51,15 @@ export function ContactDetailPanel({ contact, onClose }: ContactDetailPanelProps
           </div>
           <div className="flex items-center gap-3 rounded-lg bg-background p-3">
             <Mail className="h-4 w-4 text-muted-foreground" />
-            <span className="text-sm text-foreground">{contact.email}</span>
+            <span className="text-sm text-foreground">{contact.email || t("emptyValue")}</span>
           </div>
           <div className="flex items-center gap-3 rounded-lg bg-background p-3">
-            <Globe className="h-4 w-4 text-muted-foreground" />
-            <span className="text-sm text-foreground">{contact.lang === "zh" ? t("langChinese") : t("langEnglish")}</span>
+            <Building2 className="h-4 w-4 text-muted-foreground" />
+            <span className="text-sm text-foreground">{contact.office || t("emptyValue")}</span>
+          </div>
+          <div className="flex items-center gap-3 rounded-lg bg-background p-3">
+            <Briefcase className="h-4 w-4 text-muted-foreground" />
+            <span className="text-sm text-foreground">{contact.interest || t("emptyValue")}</span>
           </div>
           <div className="flex items-center gap-3 rounded-lg bg-background p-3">
             <Calendar className="h-4 w-4 text-muted-foreground" />
@@ -67,24 +68,6 @@ export function ContactDetailPanel({ contact, onClose }: ContactDetailPanelProps
           <div className="flex items-center gap-3 rounded-lg bg-background p-3">
             <Clock className="h-4 w-4 text-muted-foreground" />
             <span className="text-sm text-foreground">{t("visits", {count: contact.visitCount})}</span>
-          </div>
-        </div>
-
-        {/* Tags */}
-        <div className="mt-5">
-          <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
-            <Tag className="h-4 w-4" />
-            {t("tags")}
-          </div>
-          <div className="mt-2 flex flex-wrap gap-2">
-            {contact.tags.map((t) => (
-              <span
-                key={t}
-                className="rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary"
-              >
-                {t}
-              </span>
-            ))}
           </div>
         </div>
 

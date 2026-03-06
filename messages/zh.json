@@ -40,7 +40,10 @@
       "nameRequired": "请输入姓名",
       "phoneRequired": "请输入手机号",
       "phoneInvalid": "手机号格式不正确",
-      "emailInvalid": "邮箱格式不正确"
+      "emailInvalid": "邮箱格式不正确",
+      "config": "尚未配置 Supabase，当前无法提交签到。",
+      "schema": "Supabase 数据表尚未初始化，请先执行 SQL 脚本。",
+      "submitFailed": "签到失败，请稍后重试。"
     }
   },
   "kioskSuccess": {
@@ -83,6 +86,12 @@
     "metricTotalContacts": "总客户数",
     "metricConsentRate": "同意率",
     "metricAvgCheckin": "平均签到耗时",
+    "loading": "正在加载真实数据...",
+    "errors": {
+      "config": "尚未配置 Supabase，无法加载仪表盘。",
+      "schema": "Supabase 数据表尚未初始化，无法加载仪表盘。",
+      "generic": "加载仪表盘失败，请稍后重试。"
+    },
     "weekday0": "周一",
     "weekday1": "周二",
     "weekday2": "周三",
@@ -99,12 +108,19 @@
     "headerName": "姓名",
     "headerPhone": "手机号",
     "headerEmail": "邮箱",
-    "headerTags": "标签",
+    "headerInterest": "兴趣方向",
     "headerConsent": "授权",
     "headerLastVisit": "最近来访",
     "tooltipEmail": "邮件",
     "tooltipSms": "短信",
-    "page": "第 {page} / {total} 页"
+    "page": "第 {page} / {total} 页",
+    "loading": "正在加载客户数据...",
+    "empty": "暂无客户数据",
+    "errors": {
+      "config": "尚未配置 Supabase，无法加载客户数据。",
+      "schema": "Supabase 数据表尚未初始化，无法加载客户数据。",
+      "generic": "加载客户数据失败，请稍后重试。"
+    }
   },
   "visitsPage": {
     "title": "签到流水",
@@ -126,7 +142,14 @@
     "statusCompleted": "已完成",
     "statusPending": "处理中",
     "statusCancelled": "已取消",
-    "page": "第 {page} / {total} 页"
+    "page": "第 {page} / {total} 页",
+    "loading": "正在加载签到记录...",
+    "empty": "暂无签到记录",
+    "errors": {
+      "config": "尚未配置 Supabase，无法加载签到记录。",
+      "schema": "Supabase 数据表尚未初始化，无法加载签到记录。",
+      "generic": "加载签到记录失败，请稍后重试。"
+    }
   },
   "campaignsPage": {
     "title": "营销活动",
@@ -190,11 +213,8 @@
   },
   "contactDetailPanel": {
     "title": "客户详情",
-    "langChinese": "中文",
-    "langEnglish": "英文",
     "created": "创建时间：{value}",
     "visits": "来访次数：{count}",
-    "tags": "标签",
     "consent": "授权状态",
     "emailNotifications": "邮件通知",
     "smsNotifications": "短信通知",
@@ -202,6 +222,7 @@
     "optedOut": "未授权",
     "recentVisits": "最近来访",
     "noVisits": "暂无来访记录",
+    "emptyValue": "未填写",
     "statusCompleted": "已完成",
     "statusPending": "处理中",
     "statusCancelled": "已取消"
@@ -215,8 +236,8 @@
     "barSubtitle": "本周签到与新增客户",
     "barCheckins": "签到数",
     "barNewContacts": "新增客户",
-    "pieTitle": "标签分布",
-    "pieSubtitle": "客户标签构成",
+    "pieTitle": "兴趣分布",
+    "pieSubtitle": "客户兴趣方向构成",
     "hourlyTitle": "时段分布",
     "hourlySubtitle": "今日每小时签到量",
     "hourlyCheckins": "签到数"

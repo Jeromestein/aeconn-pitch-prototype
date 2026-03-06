@@ -1,40 +1,77 @@
 "use client"
 
-import {useState, useMemo} from "react"
-import {Search, Filter, ChevronLeft, ChevronRight, Check, X} from "lucide-react"
+import {useEffect, useMemo, useState} from "react"
+import {Search, ChevronLeft, ChevronRight, Check, X} from "lucide-react"
 import {useTranslations} from "next-intl"
-import {mockContacts} from "@/lib/mock-data"
-import type {Contact} from "@/lib/mock-data"
 import {ContactDetailPanel} from "@/components/admin/contact-detail-panel"
+import type { ContactRecord } from "@/lib/checkins/types"
 
 const PAGE_SIZE = 12
 
 export default function ContactsPage() {
   const t = useTranslations("contactsPage")
+  const [contacts, setContacts] = useState<ContactRecord[]>([])
   const [search, setSearch] = useState("")
-  const [tagFilter, setTagFilter] = useState<string | null>(null)
   const [page, setPage] = useState(1)
-  const [selectedContact, setSelectedContact] = useState<Contact | null>(null)
+  const [selectedContact, setSelectedContact] = useState<ContactRecord | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
-  const allTags = useMemo(() => {
-    const tags = new Set<string>()
-    mockContacts.forEach((c) => c.tags.forEach((tag) => tags.add(tag)))
-    return Array.from(tags).sort()
-  }, [])
+  useEffect(() => {
+    let cancelled = false
+
+    async function loadContacts() {
+      setLoading(true)
+      setError(null)
+
+      try {
+        const response = await fetch("/api/internal/contacts", { cache: "no-store" })
+        const result = await response.json().catch(() => null)
+
+        if (!response.ok) {
+          throw new Error(result?.error || "CONTACTS_FETCH_FAILED")
+        }
+
+        if (!cancelled) {
+          setContacts(result?.contacts || [])
+        }
+      } catch (fetchError) {
+        if (!cancelled) {
+          const errorCode = fetchError instanceof Error ? fetchError.message : "CONTACTS_FETCH_FAILED"
+          setError(
+            errorCode === "SUPABASE_NOT_CONFIGURED"
+              ? t("errors.config")
+              : errorCode === "SUPABASE_SCHEMA_MISSING"
+                ? t("errors.schema")
+              : t("errors.generic")
+          )
+        }
+      } finally {
+        if (!cancelled) {
+          setLoading(false)
+        }
+      }
+    }
+
+    void loadContacts()
+
+    return () => {
+      cancelled = true
+    }
+  }, [t])
 
   const filtered = useMemo(() => {
-    return mockContacts.filter((c) => {
+    return contacts.filter((c) => {
       const matchSearch =
         !search ||
         c.name.toLowerCase().includes(search.toLowerCase()) ||
         c.phone.includes(search) ||
-        c.email.toLowerCase().includes(search.toLowerCase())
-      const matchTag = !tagFilter || c.tags.includes(tagFilter)
-      return matchSearch && matchTag
+        (c.email || "").toLowerCase().includes(search.toLowerCase())
+      return matchSearch
     })
-  }, [search, tagFilter])
+  }, [contacts, search])
 
-  const totalPages = Math.ceil(filtered.length / PAGE_SIZE)
+  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE))
   const pageContacts = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE)
 
   const formatDate = (iso: string) => {
@@ -50,6 +87,18 @@ export default function ContactsPage() {
           <p className="text-sm text-muted-foreground">{t("summary", {count: filtered.length})}</p>
         </div>
 
+        {loading ? (
+          <div className="rounded-xl border border-border/50 bg-card p-6 text-sm text-muted-foreground">
+            {t("loading")}
+          </div>
+        ) : null}
+
+        {error ? (
+          <div className="rounded-xl border border-destructive/40 bg-destructive/10 p-6 text-sm text-destructive">
+            {error}
+          </div>
+        ) : null}
+
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground/50" />
@@ -64,38 +113,6 @@ export default function ContactsPage() {
               className="w-full rounded-lg border border-border bg-surface-2 py-2.5 pl-9 pr-4 text-sm text-foreground placeholder:text-muted-foreground/50 transition-all hover:border-primary/40 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30"
             />
           </div>
-          <div className="flex items-center gap-2 overflow-x-auto">
-            <Filter className="h-4 w-4 flex-shrink-0 text-muted-foreground" />
-            <button
-              onClick={() => {
-                setTagFilter(null)
-                setPage(1)
-              }}
-              className={`flex-shrink-0 rounded-full px-3 py-1 text-xs font-medium transition-colors ${
-                !tagFilter
-                  ? "bg-primary/15 text-primary"
-                  : "bg-surface-2 text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              {t("all")}
-            </button>
-            {allTags.map((tag) => (
-              <button
-                key={tag}
-                onClick={() => {
-                  setTagFilter(tag === tagFilter ? null : tag)
-                  setPage(1)
-                }}
-                className={`flex-shrink-0 rounded-full px-3 py-1 text-xs font-medium transition-colors ${
-                  tag === tagFilter
-                    ? "bg-primary/15 text-primary"
-                    : "bg-surface-2 text-muted-foreground hover:text-foreground"
-                }`}
-              >
-                {tag}
-              </button>
-            ))}
-          </div>
         </div>
 
         <div className="overflow-x-auto rounded-xl border border-border/50">
@@ -105,7 +122,7 @@ export default function ContactsPage() {
                 <th className="px-4 py-3 text-left font-medium text-muted-foreground">{t("headerName")}</th>
                 <th className="hidden px-4 py-3 text-left font-medium text-muted-foreground md:table-cell">{t("headerPhone")}</th>
                 <th className="hidden px-4 py-3 text-left font-medium text-muted-foreground lg:table-cell">{t("headerEmail")}</th>
-                <th className="hidden px-4 py-3 text-left font-medium text-muted-foreground sm:table-cell">{t("headerTags")}</th>
+                <th className="hidden px-4 py-3 text-left font-medium text-muted-foreground sm:table-cell">{t("headerInterest")}</th>
                 <th className="px-4 py-3 text-center font-medium text-muted-foreground">{t("headerConsent")}</th>
                 <th className="hidden px-4 py-3 text-left font-medium text-muted-foreground md:table-cell">{t("headerLastVisit")}</th>
               </tr>
@@ -129,21 +146,8 @@ export default function ContactsPage() {
                     </div>
                   </td>
                   <td className="hidden px-4 py-3 text-muted-foreground md:table-cell">{c.phone}</td>
-                  <td className="hidden px-4 py-3 text-muted-foreground lg:table-cell">{c.email}</td>
-                  <td className="hidden px-4 py-3 sm:table-cell">
-                    <div className="flex flex-wrap gap-1">
-                      {c.tags.slice(0, 2).map((tag) => (
-                        <span key={tag} className="rounded-full bg-surface-2 px-2 py-0.5 text-xs text-muted-foreground">
-                          {tag}
-                        </span>
-                      ))}
-                      {c.tags.length > 2 && (
-                        <span className="rounded-full bg-surface-2 px-2 py-0.5 text-xs text-muted-foreground">
-                          +{c.tags.length - 2}
-                        </span>
-                      )}
-                    </div>
-                  </td>
+                  <td className="hidden px-4 py-3 text-muted-foreground lg:table-cell">{c.email || "—"}</td>
+                  <td className="hidden px-4 py-3 text-muted-foreground sm:table-cell">{c.interest || "—"}</td>
                   <td className="px-4 py-3">
                     <div className="flex items-center justify-center gap-2">
                       <div
@@ -161,10 +165,17 @@ export default function ContactsPage() {
                     </div>
                   </td>
                   <td className="hidden px-4 py-3 text-muted-foreground md:table-cell">
-                    {formatDate(c.lastVisitAt)}
+                    {formatDate(c.lastCheckinAt)}
                   </td>
                 </tr>
               ))}
+              {!loading && !error && pageContacts.length === 0 ? (
+                <tr>
+                  <td colSpan={6} className="px-4 py-10 text-center text-sm text-muted-foreground">
+                    {t("empty")}
+                  </td>
+                </tr>
+              ) : null}
             </tbody>
           </table>
         </div>

@@ -1,20 +1,66 @@
 "use client"
 
-import {useState, useMemo} from "react"
+import {useEffect, useMemo, useState} from "react"
 import {Search, ChevronLeft, ChevronRight, Monitor, Globe, Hand} from "lucide-react"
 import {useTranslations} from "next-intl"
-import {mockVisits} from "@/lib/mock-data"
+import type { CheckinRecord } from "@/lib/checkins/types"
 
 const PAGE_SIZE = 15
 
 export default function VisitsPage() {
   const t = useTranslations("visitsPage")
+  const [visits, setVisits] = useState<CheckinRecord[]>([])
   const [search, setSearch] = useState("")
   const [statusFilter, setStatusFilter] = useState<string | null>(null)
   const [page, setPage] = useState(1)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    let cancelled = false
+
+    async function loadVisits() {
+      setLoading(true)
+      setError(null)
+
+      try {
+        const response = await fetch("/api/internal/checkins", { cache: "no-store" })
+        const result = await response.json().catch(() => null)
+
+        if (!response.ok) {
+          throw new Error(result?.error || "CHECKINS_FETCH_FAILED")
+        }
+
+        if (!cancelled) {
+          setVisits(result?.checkins || [])
+        }
+      } catch (fetchError) {
+        if (!cancelled) {
+          const errorCode = fetchError instanceof Error ? fetchError.message : "CHECKINS_FETCH_FAILED"
+          setError(
+            errorCode === "SUPABASE_NOT_CONFIGURED"
+              ? t("errors.config")
+              : errorCode === "SUPABASE_SCHEMA_MISSING"
+                ? t("errors.schema")
+              : t("errors.generic")
+          )
+        }
+      } finally {
+        if (!cancelled) {
+          setLoading(false)
+        }
+      }
+    }
+
+    void loadVisits()
+
+    return () => {
+      cancelled = true
+    }
+  }, [t])
 
   const filtered = useMemo(() => {
-    return mockVisits.filter((v) => {
+    return visits.filter((v) => {
       const matchSearch =
         !search ||
         v.contactName.toLowerCase().includes(search.toLowerCase()) ||
@@ -23,9 +69,9 @@ export default function VisitsPage() {
       const matchStatus = !statusFilter || v.status === statusFilter
       return matchSearch && matchStatus
     })
-  }, [search, statusFilter])
+  }, [search, statusFilter, visits])
 
-  const totalPages = Math.ceil(filtered.length / PAGE_SIZE)
+  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE))
   const pageVisits = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE)
 
   const formatDate = (iso: string) => {
@@ -64,6 +110,18 @@ export default function VisitsPage() {
         <h1 className="text-2xl font-bold text-foreground">{t("title")}</h1>
         <p className="text-sm text-muted-foreground">{t("summary", {count: filtered.length})}</p>
       </div>
+
+      {loading ? (
+        <div className="rounded-xl border border-border/50 bg-card p-6 text-sm text-muted-foreground">
+          {t("loading")}
+        </div>
+      ) : null}
+
+      {error ? (
+        <div className="rounded-xl border border-destructive/40 bg-destructive/10 p-6 text-sm text-destructive">
+          {error}
+        </div>
+      ) : null}
 
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
         <div className="relative flex-1">
@@ -144,6 +202,13 @@ export default function VisitsPage() {
                 <td className="px-4 py-3 text-sm text-muted-foreground">{formatDate(v.checkedInAt)}</td>
               </tr>
             ))}
+            {!loading && !error && pageVisits.length === 0 ? (
+              <tr>
+                <td colSpan={6} className="px-4 py-10 text-center text-sm text-muted-foreground">
+                  {t("empty")}
+                </td>
+              </tr>
+            ) : null}
           </tbody>
         </table>
       </div>
