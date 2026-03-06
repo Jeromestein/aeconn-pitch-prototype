@@ -4,10 +4,21 @@ import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts"
 import {useTranslations} from "next-intl"
 
 interface PieChartProps {
-  data: { tag: string; count: number }[]
+  data: { tag: string; label: string; count: number }[]
 }
 
-const COLORS = ["#C9A84C", "#D4AF37", "#8B7536", "#E6CE70", "#A08C3A", "#6B5E2D"]
+const INTEREST_COLORS: Record<string, string> = {
+  insurance: "#D4AF37",
+  investment: "#2BB8A5",
+  agent: "#F97360",
+  other: "#8B5CF6",
+}
+
+const FALLBACK_COLORS = ["#3B82F6", "#F59E0B", "#10B981", "#EF4444", "#8B5CF6", "#EC4899"]
+
+function getInterestColor(tag: string, index: number) {
+  return INTEREST_COLORS[tag] ?? FALLBACK_COLORS[index % FALLBACK_COLORS.length]
+}
 
 export function DashboardPieChart({ data }: PieChartProps) {
   const t = useTranslations("charts")
@@ -28,11 +39,14 @@ export function DashboardPieChart({ data }: PieChartProps) {
               innerRadius={50}
               outerRadius={80}
               dataKey="count"
-              nameKey="tag"
+              nameKey="label"
               strokeWidth={0}
             >
               {data.map((_, index) => (
-                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                <Cell
+                  key={`cell-${index}`}
+                  fill={getInterestColor(data[index].tag, index)}
+                />
               ))}
             </Pie>
             <Tooltip
@@ -53,10 +67,10 @@ export function DashboardPieChart({ data }: PieChartProps) {
           <div key={item.tag} className="flex items-center gap-1.5">
             <div
               className="h-2.5 w-2.5 rounded-full"
-              style={{ backgroundColor: COLORS[i % COLORS.length] }}
+              style={{ backgroundColor: getInterestColor(item.tag, i) }}
             />
             <span className="text-xs text-muted-foreground">
-              {item.tag} ({item.count})
+              {item.label} ({item.count})
             </span>
           </div>
         ))}

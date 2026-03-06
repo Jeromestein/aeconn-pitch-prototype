@@ -91,8 +91,9 @@ export default function DashboardPage() {
   const pieChartData = dashboard?.topTags.map((item) => {
     const key = getInterestTranslationKey(item.tag)
     return {
-      ...item,
-      tag: key ? kioskFormT(key) : item.tag,
+      count: item.count,
+      tag: item.tag,
+      label: key ? kioskFormT(key) : item.tag,
     }
   }) || []
 
