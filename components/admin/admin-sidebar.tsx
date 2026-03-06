@@ -6,12 +6,12 @@ import {
   Users,
   ClipboardList,
   Megaphone,
-  LogOut,
   ChevronLeft,
   Menu,
 } from "lucide-react"
 import {useState} from "react"
 import {useTranslations} from "next-intl"
+import {SignOutButton} from "@/components/admin/sign-out-button"
 
 const ADMIN_BASE_PATH = "/internal"
 const DASHBOARD_PATH = `${ADMIN_BASE_PATH}/dashboard`
@@ -83,13 +83,10 @@ export function AdminSidebar() {
       </nav>
 
       <div className="border-t border-border/50 p-3">
-        <Link
-          href={ADMIN_BASE_PATH}
-          className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
-        >
-          <LogOut className="h-5 w-5 flex-shrink-0" />
-          {!collapsed && <span>{t("signOut")}</span>}
-        </Link>
+        <SignOutButton
+          collapsed={collapsed}
+          className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-foreground disabled:opacity-60"
+        />
       </div>
     </div>
   )
