@@ -41,9 +41,9 @@ export function KioskForm({ onSuccess, onReset }: KioskFormProps) {
   const [submitError, setSubmitError] = useState<string | null>(null)
 
   const interestOptions = [
-    { value: "design", label: t("interestDesign") },
-    { value: "product", label: t("interestProduct") },
-    { value: "partner", label: t("interestPartner") },
+    { value: "insurance", label: t("interestDesign") },
+    { value: "investment", label: t("interestProduct") },
+    { value: "loan", label: t("interestPartner") },
     { value: "other", label: t("interestOther") },
   ]
 

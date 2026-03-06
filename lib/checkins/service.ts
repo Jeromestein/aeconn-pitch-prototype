@@ -6,6 +6,7 @@ import {
   type ContactRecord,
   type DashboardMetricsRecord,
 } from "@/lib/checkins/types"
+import { normalizeInterestValue } from "@/lib/checkins/interest"
 
 type ContactRow = {
   id: string
@@ -84,7 +85,7 @@ function toCheckinRecord(row: CheckinRow): CheckinRecord {
     kioskId: row.kiosk_id,
     source: row.source,
     status: row.status,
-    interest: row.interest,
+    interest: normalizeInterestValue(row.interest),
     office: row.office,
     emailOptIn: row.email_opt_in,
     smsOptIn: row.sms_opt_in,
@@ -97,7 +98,7 @@ function toContactRecord(row: ContactRow, recentCheckins: CheckinRecord[], visit
     name: row.name,
     phone: row.phone,
     email: row.email,
-    interest: row.interest,
+    interest: normalizeInterestValue(row.interest),
     office: row.office,
     emailOptIn: row.email_opt_in,
     smsOptIn: row.sms_opt_in,
@@ -223,7 +224,7 @@ export function parseCheckinPayload(input: unknown) {
       name: payload.name.trim(),
       phone: normalizedPhone,
       email: normalizedEmail,
-      interest: normalizeOptionalValue(payload.interest),
+      interest: normalizeInterestValue(payload.interest),
       office: normalizeOptionalValue(payload.office),
       emailOptIn: payload.emailOptIn,
       smsOptIn: payload.smsOptIn,

@@ -5,11 +5,13 @@ import {Search, ChevronLeft, ChevronRight, Check, X} from "lucide-react"
 import {useTranslations} from "next-intl"
 import {ContactDetailPanel} from "@/components/admin/contact-detail-panel"
 import type { ContactRecord } from "@/lib/checkins/types"
+import { getInterestTranslationKey } from "@/lib/checkins/interest"
 
 const PAGE_SIZE = 12
 
 export default function ContactsPage() {
   const t = useTranslations("contactsPage")
+  const kioskFormT = useTranslations("kioskForm")
   const [contacts, setContacts] = useState<ContactRecord[]>([])
   const [search, setSearch] = useState("")
   const [page, setPage] = useState(1)
@@ -77,6 +79,11 @@ export default function ContactsPage() {
   const formatDate = (iso: string) => {
     const d = new Date(iso)
     return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`
+  }
+
+  const formatInterest = (interest: string | null) => {
+    const key = getInterestTranslationKey(interest)
+    return key ? kioskFormT(key) : interest || "—"
   }
 
   return (
@@ -147,7 +154,7 @@ export default function ContactsPage() {
                   </td>
                   <td className="hidden px-4 py-3 text-muted-foreground md:table-cell">{c.phone}</td>
                   <td className="hidden px-4 py-3 text-muted-foreground lg:table-cell">{c.email || "—"}</td>
-                  <td className="hidden px-4 py-3 text-muted-foreground sm:table-cell">{c.interest || "—"}</td>
+                  <td className="hidden px-4 py-3 text-muted-foreground sm:table-cell">{formatInterest(c.interest)}</td>
                   <td className="px-4 py-3">
                     <div className="flex items-center justify-center gap-2">
                       <div

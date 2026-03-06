@@ -3,6 +3,7 @@
 import { X, Mail, Phone, Calendar, ShieldCheck, Clock, Building2, Briefcase } from "lucide-react"
 import {useTranslations} from "next-intl"
 import type { ContactRecord } from "@/lib/checkins/types"
+import { getInterestTranslationKey } from "@/lib/checkins/interest"
 
 interface ContactDetailPanelProps {
   contact: ContactRecord
@@ -11,7 +12,9 @@ interface ContactDetailPanelProps {
 
 export function ContactDetailPanel({ contact, onClose }: ContactDetailPanelProps) {
   const t = useTranslations("contactDetailPanel")
+  const kioskFormT = useTranslations("kioskForm")
   const contactVisits = contact.recentCheckins
+  const interestKey = getInterestTranslationKey(contact.interest)
 
   const formatDate = (iso: string) => {
     const d = new Date(iso)
@@ -59,7 +62,9 @@ export function ContactDetailPanel({ contact, onClose }: ContactDetailPanelProps
           </div>
           <div className="flex items-center gap-3 rounded-lg bg-background p-3">
             <Briefcase className="h-4 w-4 text-muted-foreground" />
-            <span className="text-sm text-foreground">{contact.interest || t("emptyValue")}</span>
+            <span className="text-sm text-foreground">
+              {interestKey ? kioskFormT(interestKey) : contact.interest || t("emptyValue")}
+            </span>
           </div>
           <div className="flex items-center gap-3 rounded-lg bg-background p-3">
             <Calendar className="h-4 w-4 text-muted-foreground" />

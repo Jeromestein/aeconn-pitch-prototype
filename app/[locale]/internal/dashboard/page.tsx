@@ -8,9 +8,11 @@ import {DashboardBarChart} from "@/components/admin/dashboard-bar-chart"
 import {DashboardPieChart} from "@/components/admin/dashboard-pie-chart"
 import {DashboardHourlyChart} from "@/components/admin/dashboard-hourly-chart"
 import type { DashboardMetricsRecord } from "@/lib/checkins/types"
+import { getInterestTranslationKey } from "@/lib/checkins/interest"
 
 export default function DashboardPage() {
   const t = useTranslations("dashboard")
+  const kioskFormT = useTranslations("kioskForm")
   const [dashboard, setDashboard] = useState<DashboardMetricsRecord | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -86,6 +88,14 @@ export default function DashboardPage() {
     day: t(`weekday${index}`),
   })) || []
 
+  const pieChartData = dashboard?.topTags.map((item) => {
+    const key = getInterestTranslationKey(item.tag)
+    return {
+      ...item,
+      tag: key ? kioskFormT(key) : item.tag,
+    }
+  }) || []
+
   return (
     <div className="flex flex-col gap-6 p-6 lg:p-8">
       <div className="flex flex-col gap-1">
@@ -133,7 +143,7 @@ export default function DashboardPage() {
           <DashboardTrendChart data={dashboard?.monthlyTrend || []} />
         </div>
         <div>
-          <DashboardPieChart data={dashboard?.topTags || []} />
+          <DashboardPieChart data={pieChartData} />
         </div>
       </div>
 
