@@ -184,6 +184,102 @@ async function findExistingContact(phone: string, email: string | null) {
   return emailResult.data
 }
 
+function parseOptionalDate(value?: string | null) {
+  if (!value?.trim()) {
+    return null
+  }
+
+  const date = new Date(value)
+
+  if (Number.isNaN(date.getTime())) {
+    throw new Error("INVALID_DATE")
+  }
+
+  return date.toISOString()
+}
+
+function parseBooleanValue(value?: string | boolean | null) {
+  if (typeof value === "boolean") {
+    return value
+  }
+
+  const normalized = value?.trim().toLowerCase()
+
+  if (!normalized) {
+    return false
+  }
+
+  return ["true", "1", "yes", "y"].includes(normalized)
+}
+
+async function upsertContactRecord(input: {
+  name: string
+  phone: string
+  email: string | null
+  interest: string | null
+  office: string | null
+  emailOptIn: boolean
+  smsOptIn: boolean
+  createdAt?: string | null
+  lastCheckinAt?: string | null
+}) {
+  const adminClient = getSupabaseAdminClient()
+  const existingContact = await findExistingContact(input.phone, input.email)
+  const fallbackTimestamp = input.lastCheckinAt || input.createdAt || new Date().toISOString()
+
+  if (existingContact) {
+    const nextLastCheckinAt =
+      new Date(existingContact.last_checkin_at).getTime() > new Date(fallbackTimestamp).getTime()
+        ? existingContact.last_checkin_at
+        : fallbackTimestamp
+
+    const updateResult = await adminClient
+      .from("contacts")
+      .update({
+        name: input.name,
+        phone: input.phone,
+        email: input.email,
+        interest: input.interest,
+        office: input.office,
+        email_opt_in: input.emailOptIn,
+        sms_opt_in: input.smsOptIn,
+        last_checkin_at: nextLastCheckinAt,
+      })
+      .eq("id", existingContact.id)
+      .select("id, name, phone, email, interest, office, email_opt_in, sms_opt_in, last_checkin_at, created_at, updated_at")
+      .single<ContactRow>()
+
+    if (updateResult.error) {
+      throw new Error(`Failed to update contact: ${updateResult.error.message}`)
+    }
+
+    return updateResult.data
+  }
+
+  const insertResult = await adminClient
+    .from("contacts")
+    .insert({
+      name: input.name,
+      phone: input.phone,
+      email: input.email,
+      interest: input.interest,
+      office: input.office,
+      email_opt_in: input.emailOptIn,
+      sms_opt_in: input.smsOptIn,
+      last_checkin_at: fallbackTimestamp,
+      created_at: input.createdAt || undefined,
+      updated_at: input.createdAt || undefined,
+    })
+    .select("id, name, phone, email, interest, office, email_opt_in, sms_opt_in, last_checkin_at, created_at, updated_at")
+    .single<ContactRow>()
+
+  if (insertResult.error) {
+    throw new Error(`Failed to create contact: ${insertResult.error.message}`)
+  }
+
+  return insertResult.data
+}
+
 export function parseCheckinPayload(input: unknown) {
   const result = checkinPayloadSchema.safeParse(input)
 
@@ -432,4 +528,56 @@ export async function getDashboardMetrics(): Promise<DashboardMetricsRecord> {
     topTags,
     hourlyDistribution,
   }
+}
+
+export async function importContacts(
+  rows: Array<{
+    name: string
+    phone: string
+    email?: string | null
+    interest?: string | null
+    office?: string | null
+    emailOptIn?: string | boolean | null
+    smsOptIn?: string | boolean | null
+    createdAt?: string | null
+    lastCheckinAt?: string | null
+  }>
+) {
+  ensureSupabaseConfigured()
+
+  if (rows.length === 0) {
+    throw new Error("IMPORT_EMPTY")
+  }
+
+  let imported = 0
+
+  for (const row of rows) {
+    const name = row.name.trim()
+    const phone = normalizePhone(row.phone)
+    const email = normalizeEmail(row.email || undefined)
+
+    if (!name || !validateNormalizedPhone(phone)) {
+      throw new Error("INVALID_PAYLOAD")
+    }
+
+    if (!validateNormalizedEmail(email)) {
+      throw new Error("INVALID_EMAIL")
+    }
+
+    await upsertContactRecord({
+      name,
+      phone,
+      email,
+      interest: normalizeInterestValue(row.interest),
+      office: normalizeOptionalValue(row.office || undefined),
+      emailOptIn: parseBooleanValue(row.emailOptIn),
+      smsOptIn: parseBooleanValue(row.smsOptIn),
+      createdAt: parseOptionalDate(row.createdAt),
+      lastCheckinAt: parseOptionalDate(row.lastCheckinAt),
+    })
+
+    imported += 1
+  }
+
+  return { imported }
 }

@@ -1,13 +1,28 @@
 "use client"
 
-import {useEffect, useMemo, useState} from "react"
-import {Search, ChevronLeft, ChevronRight, Check, X} from "lucide-react"
+import {ChangeEvent, useEffect, useMemo, useRef, useState} from "react"
+import {Search, ChevronLeft, ChevronRight, Check, X, Download, Upload} from "lucide-react"
 import {useTranslations} from "next-intl"
 import {ContactDetailPanel} from "@/components/admin/contact-detail-panel"
+import {Button} from "@/components/ui/button"
+import {toast} from "@/hooks/use-toast"
 import type { ContactRecord } from "@/lib/checkins/types"
 import { getInterestTranslationKey } from "@/lib/checkins/interest"
+import { buildCsvContent, downloadCsvFile, parseCsvContent } from "@/lib/csv"
 
 const PAGE_SIZE = 12
+
+type ImportedContactRow = {
+  name: string
+  phone: string
+  email?: string
+  interest?: string
+  office?: string
+  emailOptIn?: string
+  smsOptIn?: string
+  createdAt?: string
+  lastCheckinAt?: string
+}
 
 export default function ContactsPage() {
   const t = useTranslations("contactsPage")
@@ -18,11 +33,80 @@ export default function ContactsPage() {
   const [selectedContact, setSelectedContact] = useState<ContactRecord | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [exporting, setExporting] = useState(false)
+  const [importing, setImporting] = useState(false)
+  const fileInputRef = useRef<HTMLInputElement | null>(null)
+
+  const getColumnValue = (headers: string[], row: string[], aliases: string[]) => {
+    const index = headers.findIndex((header) => aliases.includes(header.trim()))
+    return index >= 0 ? (row[index] || "").trim() : ""
+  }
+
+  const parseImportedContacts = (content: string) => {
+    const rows = parseCsvContent(content)
+
+    if (rows.length < 2) {
+      throw new Error("IMPORT_EMPTY")
+    }
+
+    const [headerRow, ...dataRows] = rows
+    const headers = headerRow.map((header) => header.trim())
+    const importedRows = dataRows
+      .map<ImportedContactRow>((row) => ({
+        name: getColumnValue(headers, row, ["姓名", "Name"]),
+        phone: getColumnValue(headers, row, ["手机号", "Phone"]),
+        email: getColumnValue(headers, row, ["邮箱", "Email"]),
+        interest: getColumnValue(headers, row, ["兴趣方向", "Interest"]),
+        office: getColumnValue(headers, row, ["办公室", "Office"]),
+        emailOptIn: getColumnValue(headers, row, ["邮件授权", "Email Consent"]),
+        smsOptIn: getColumnValue(headers, row, ["短信授权", "SMS Consent"]),
+        createdAt: getColumnValue(headers, row, ["创建时间", "Created At"]),
+        lastCheckinAt: getColumnValue(headers, row, ["最近来访", "Last Visit"]),
+      }))
+      .filter((row) => Object.values(row).some((value) => value && value.length > 0))
+
+    if (importedRows.length === 0) {
+      throw new Error("IMPORT_EMPTY")
+    }
+
+    if (importedRows.some((row) => !row.name || !row.phone)) {
+      throw new Error("IMPORT_REQUIRED_FIELDS")
+    }
+
+    return importedRows
+  }
+
+  async function refreshContacts() {
+    setLoading(true)
+    setError(null)
+
+    try {
+      const response = await fetch("/api/internal/contacts", { cache: "no-store" })
+      const result = await response.json().catch(() => null)
+
+      if (!response.ok) {
+        throw new Error(result?.error || "CONTACTS_FETCH_FAILED")
+      }
+
+      setContacts(result?.contacts || [])
+    } catch (fetchError) {
+      const errorCode = fetchError instanceof Error ? fetchError.message : "CONTACTS_FETCH_FAILED"
+      setError(
+        errorCode === "SUPABASE_NOT_CONFIGURED"
+          ? t("errors.config")
+          : errorCode === "SUPABASE_SCHEMA_MISSING"
+            ? t("errors.schema")
+            : t("errors.generic")
+      )
+    } finally {
+      setLoading(false)
+    }
+  }
 
   useEffect(() => {
     let cancelled = false
 
-    async function loadContacts() {
+    void (async () => {
       setLoading(true)
       setError(null)
 
@@ -45,7 +129,7 @@ export default function ContactsPage() {
               ? t("errors.config")
               : errorCode === "SUPABASE_SCHEMA_MISSING"
                 ? t("errors.schema")
-              : t("errors.generic")
+                : t("errors.generic")
           )
         }
       } finally {
@@ -53,9 +137,7 @@ export default function ContactsPage() {
           setLoading(false)
         }
       }
-    }
-
-    void loadContacts()
+    })()
 
     return () => {
       cancelled = true
@@ -86,12 +168,146 @@ export default function ContactsPage() {
     return key ? kioskFormT(key) : interest || "—"
   }
 
+  const handleExport = () => {
+    if (filtered.length === 0 || exporting) {
+      return
+    }
+
+    setExporting(true)
+
+    try {
+      const content = buildCsvContent(
+        [
+          t("headerName"),
+          t("headerPhone"),
+          t("headerEmail"),
+          t("headerInterest"),
+          t("headerOffice"),
+          t("headerConsentEmail"),
+          t("headerConsentSms"),
+          t("headerVisitCount"),
+          t("headerCreatedAt"),
+          t("headerLastVisit"),
+        ],
+        filtered.map((contact) => [
+          contact.name,
+          contact.phone,
+          contact.email || "",
+          formatInterest(contact.interest),
+          contact.office || "",
+          contact.emailOptIn,
+          contact.smsOptIn,
+          contact.visitCount,
+          formatDate(contact.createdAt),
+          formatDate(contact.lastCheckinAt),
+        ])
+      )
+
+      const dateKey = new Date().toISOString().slice(0, 10)
+      downloadCsvFile(`contacts-${dateKey}.csv`, content)
+    } finally {
+      setExporting(false)
+    }
+  }
+
+  const handleImportClick = () => {
+    if (importing) {
+      return
+    }
+
+    fileInputRef.current?.click()
+  }
+
+  const handleImportFile = async (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    event.target.value = ""
+
+    if (!file) {
+      return
+    }
+
+    setImporting(true)
+
+    try {
+      const content = await file.text()
+      const rows = parseImportedContacts(content)
+      const response = await fetch("/api/internal/contacts", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ rows }),
+      })
+      const result = await response.json().catch(() => null)
+
+      if (!response.ok) {
+        throw new Error(result?.error || "CONTACTS_IMPORT_FAILED")
+      }
+
+      await refreshContacts()
+
+      toast({
+        title: t("importSuccessTitle"),
+        description: t("importSuccessDescription", { count: result?.imported || rows.length }),
+      })
+    } catch (importError) {
+      const errorCode = importError instanceof Error ? importError.message : "CONTACTS_IMPORT_FAILED"
+      const description =
+        errorCode === "IMPORT_EMPTY"
+          ? t("importErrors.empty")
+          : errorCode === "IMPORT_REQUIRED_FIELDS" || errorCode === "INVALID_PAYLOAD"
+            ? t("importErrors.required")
+            : errorCode === "INVALID_EMAIL"
+              ? t("importErrors.email")
+              : errorCode === "INVALID_DATE"
+                ? t("importErrors.date")
+                : t("importErrors.generic")
+
+      toast({
+        title: t("importErrorTitle"),
+        description,
+        variant: "destructive",
+      })
+    } finally {
+      setImporting(false)
+    }
+  }
+
   return (
     <div className="flex h-full">
       <div className={`flex flex-1 flex-col gap-6 p-6 lg:p-8 ${selectedContact ? "hidden lg:flex" : ""}`}>
-        <div className="flex flex-col gap-1">
-          <h1 className="text-2xl font-bold text-foreground">{t("title")}</h1>
-          <p className="text-sm text-muted-foreground">{t("summary", {count: filtered.length})}</p>
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+          <div className="flex flex-col gap-1">
+            <h1 className="text-2xl font-bold text-foreground">{t("title")}</h1>
+            <p className="text-sm text-muted-foreground">{t("summary", {count: filtered.length})}</p>
+          </div>
+          <div className="flex flex-wrap items-center gap-2">
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept=".csv,text/csv"
+              className="hidden"
+              onChange={handleImportFile}
+            />
+            <Button
+              type="button"
+              variant="outline"
+              onClick={handleImportClick}
+              disabled={loading || !!error || importing}
+            >
+              <Upload className="h-4 w-4" />
+              {importing ? t("importing") : t("import")}
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={handleExport}
+              disabled={loading || !!error || filtered.length === 0 || exporting}
+            >
+              <Download className="h-4 w-4" />
+              {exporting ? t("exporting") : t("export")}
+            </Button>
+          </div>
         </div>
 
         {loading ? (

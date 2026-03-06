@@ -3,18 +3,30 @@
 import {useTransition} from "react"
 import {useLocale, useTranslations} from "next-intl"
 import {usePathname, useRouter} from "@/i18n/navigation"
+import {cn} from "@/lib/utils"
 
 const locales = [
   {value: "en", label: "EN"},
   {value: "zh", label: "中文"},
 ] as const
 
-export function LanguageSwitcher() {
+type LanguageSwitcherProps = {
+  floating?: boolean
+  forceVisible?: boolean
+  className?: string
+}
+
+export function LanguageSwitcher({
+  floating = true,
+  forceVisible = false,
+  className,
+}: LanguageSwitcherProps = {}) {
   const t = useTranslations("languageSwitcher")
   const locale = useLocale()
   const pathname = usePathname()
   const router = useRouter()
   const [isPending, startTransition] = useTransition()
+  const isBackofficeRoute = pathname.startsWith("/internal") || pathname.startsWith("/admin")
 
   const onSwitch = (nextLocale: (typeof locales)[number]["value"]) => {
     if (nextLocale === locale) return
@@ -23,8 +35,18 @@ export function LanguageSwitcher() {
     })
   }
 
+  if (isBackofficeRoute && !forceVisible) {
+    return null
+  }
+
   return (
-    <div className="fixed right-4 top-4 z-[60] rounded-xl border border-border/60 bg-background/90 p-1 shadow-sm backdrop-blur">
+    <div
+      className={cn(
+        "rounded-xl border border-border/60 bg-background/90 p-1 shadow-sm backdrop-blur",
+        floating && "fixed right-4 top-4 z-[60]",
+        className
+      )}
+    >
       <div className="sr-only">{t("label")}</div>
       <div className="flex items-center gap-1">
         {locales.map((item) => {

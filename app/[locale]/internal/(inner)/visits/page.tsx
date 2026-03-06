@@ -1,9 +1,11 @@
 "use client"
 
 import {useEffect, useMemo, useState} from "react"
-import {Search, ChevronLeft, ChevronRight, Monitor, Globe, Hand} from "lucide-react"
+import {Search, ChevronLeft, ChevronRight, Monitor, Globe, Hand, Download} from "lucide-react"
 import {useTranslations} from "next-intl"
+import {Button} from "@/components/ui/button"
 import type { CheckinRecord } from "@/lib/checkins/types"
+import { buildCsvContent, downloadCsvFile } from "@/lib/csv"
 
 const PAGE_SIZE = 15
 
@@ -15,6 +17,7 @@ export default function VisitsPage() {
   const [page, setPage] = useState(1)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [exporting, setExporting] = useState(false)
 
   useEffect(() => {
     let cancelled = false
@@ -104,11 +107,64 @@ export default function VisitsPage() {
     {id: "cancelled", label: t("filterCancelled")},
   ]
 
+  const handleExport = () => {
+    if (filtered.length === 0 || exporting) {
+      return
+    }
+
+    setExporting(true)
+
+    try {
+      const content = buildCsvContent(
+        [
+          t("headerId"),
+          t("headerContact"),
+          t("headerContactId"),
+          t("headerSource"),
+          t("headerKiosk"),
+          t("headerInterest"),
+          t("headerConsentEmail"),
+          t("headerConsentSms"),
+          t("headerStatus"),
+          t("headerTime"),
+        ],
+        filtered.map((visit) => [
+          visit.id,
+          visit.contactName,
+          visit.contactId,
+          sourceLabel(visit.source),
+          visit.office || "",
+          visit.interest || "",
+          visit.emailOptIn,
+          visit.smsOptIn,
+          statusLabel(visit.status),
+          formatDate(visit.checkedInAt),
+        ])
+      )
+
+      const dateKey = new Date().toISOString().slice(0, 10)
+      downloadCsvFile(`visits-${dateKey}.csv`, content)
+    } finally {
+      setExporting(false)
+    }
+  }
+
   return (
     <div className="flex flex-col gap-6 p-6 lg:p-8">
-      <div className="flex flex-col gap-1">
-        <h1 className="text-2xl font-bold text-foreground">{t("title")}</h1>
-        <p className="text-sm text-muted-foreground">{t("summary", {count: filtered.length})}</p>
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+        <div className="flex flex-col gap-1">
+          <h1 className="text-2xl font-bold text-foreground">{t("title")}</h1>
+          <p className="text-sm text-muted-foreground">{t("summary", {count: filtered.length})}</p>
+        </div>
+        <Button
+          type="button"
+          variant="outline"
+          onClick={handleExport}
+          disabled={loading || !!error || filtered.length === 0 || exporting}
+        >
+          <Download className="h-4 w-4" />
+          {exporting ? t("exporting") : t("export")}
+        </Button>
       </div>
 
       {loading ? (

@@ -15,6 +15,22 @@ export function normalizeInterestValue(value?: string | null) {
     return "agent"
   }
 
+  if (normalized === "insurance" || normalized === "保险") {
+    return "insurance"
+  }
+
+  if (normalized === "investment" || normalized === "投资") {
+    return "investment"
+  }
+
+  if (normalized === "agent" || normalized === "副业") {
+    return "agent"
+  }
+
+  if (normalized === "other" || normalized === "其他") {
+    return "other"
+  }
+
   return CANONICAL_INTEREST_VALUES.has(normalized) ? normalized : null
 }
 
