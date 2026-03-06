@@ -9,7 +9,13 @@ let browserClient: SupabaseClient | null = null
 export function getSupabaseBrowserClient() {
   if (!browserClient) {
     const { url, anonKey } = getSupabaseBrowserEnv()
-    browserClient = createBrowserClient(url, anonKey)
+    browserClient = createBrowserClient(url, anonKey, {
+      auth: {
+        persistSession: true,
+        autoRefreshToken: true,
+        detectSessionInUrl: true,
+      },
+    })
   }
 
   return browserClient
