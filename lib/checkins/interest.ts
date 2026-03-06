@@ -1,7 +1,7 @@
 const CANONICAL_INTEREST_VALUES = new Set([
   "insurance",
   "investment",
-  "loan",
+  "agent",
   "other",
 ])
 
@@ -9,6 +9,10 @@ export function normalizeInterestValue(value?: string | null) {
   const normalized = value?.trim().toLowerCase()
   if (!normalized) {
     return null
+  }
+
+  if (normalized === "loan") {
+    return "agent"
   }
 
   return CANONICAL_INTEREST_VALUES.has(normalized) ? normalized : null
@@ -20,7 +24,7 @@ export function getInterestTranslationKey(value?: string | null) {
       return "interestDesign"
     case "investment":
       return "interestProduct"
-    case "loan":
+    case "agent":
       return "interestPartner"
     case "other":
       return "interestOther"

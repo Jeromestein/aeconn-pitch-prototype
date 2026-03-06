@@ -43,7 +43,7 @@ export function KioskForm({ onSuccess, onReset }: KioskFormProps) {
   const interestOptions = [
     { value: "insurance", label: t("interestDesign") },
     { value: "investment", label: t("interestProduct") },
-    { value: "loan", label: t("interestPartner") },
+    { value: "agent", label: t("interestPartner") },
     { value: "other", label: t("interestOther") },
   ]
 
