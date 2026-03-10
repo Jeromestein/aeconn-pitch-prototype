@@ -16,7 +16,7 @@
     "name": "Name",
     "namePlaceholder": "Enter your full name",
     "phone": "Phone",
-    "phonePlaceholder": "138 0000 0000",
+    "phonePlaceholder": "(213) 555-0123",
     "email": "Email",
     "emailPlaceholder": "your@email.com",
     "interest": "Interest",
@@ -39,7 +39,7 @@
     "errors": {
       "nameRequired": "Please enter your name",
       "phoneRequired": "Please enter your phone number",
-      "phoneInvalid": "Invalid phone number format",
+      "phoneInvalid": "Please enter a valid US phone number",
       "emailInvalid": "Invalid email format",
       "config": "Supabase is not configured, so check-in is unavailable.",
       "schema": "Supabase tables are not initialized yet. Run the SQL script first.",

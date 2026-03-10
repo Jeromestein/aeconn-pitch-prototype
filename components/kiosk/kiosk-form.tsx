@@ -25,6 +25,24 @@ interface FormErrors {
   email?: string
 }
 
+function formatUsPhoneInput(value: string) {
+  const digits = value.replace(/\D/g, "").slice(0, 10)
+
+  if (digits.length <= 3) {
+    return digits
+  }
+
+  if (digits.length <= 6) {
+    return `(${digits.slice(0, 3)}) ${digits.slice(3)}`
+  }
+
+  return `(${digits.slice(0, 3)}) ${digits.slice(3, 6)}-${digits.slice(6)}`
+}
+
+function isValidUsPhone(value: string) {
+  return value.replace(/\D/g, "").length === 10
+}
+
 export function KioskForm({ onSuccess, onReset }: KioskFormProps) {
   const t = useTranslations("kioskForm")
   const [form, setForm] = useState<FormData>({
@@ -64,7 +82,7 @@ export function KioskForm({ onSuccess, onReset }: KioskFormProps) {
 
     if (!form.phone.trim()) {
       newErrors.phone = t("errors.phoneRequired")
-    } else if (!/^[\d+\-\s()]{7,15}$/.test(form.phone)) {
+    } else if (!isValidUsPhone(form.phone)) {
       newErrors.phone = t("errors.phoneInvalid")
     }
 
@@ -168,9 +186,11 @@ export function KioskForm({ onSuccess, onReset }: KioskFormProps) {
             placeholder={t("phonePlaceholder")}
             value={form.phone}
             onChange={(e) => {
-              setForm({ ...form, phone: e.target.value })
+              setForm({ ...form, phone: formatUsPhoneInput(e.target.value) })
               if (errors.phone) setErrors({ ...errors, phone: undefined })
             }}
+            inputMode="numeric"
+            autoComplete="tel-national"
             className={`${inputClasses} ${errors.phone ? "border-destructive ring-1 ring-destructive/50" : "border-border hover:border-primary/40"}`}
           />
           {errors.phone && (

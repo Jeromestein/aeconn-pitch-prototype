@@ -16,7 +16,7 @@
     "name": "姓名",
     "namePlaceholder": "请输入您的姓名",
     "phone": "手机号",
-    "phonePlaceholder": "138 0000 0000",
+    "phonePlaceholder": "(213) 555-0123",
     "email": "邮箱",
     "emailPlaceholder": "your@email.com",
     "interest": "兴趣方向",
@@ -39,7 +39,7 @@
     "errors": {
       "nameRequired": "请输入姓名",
       "phoneRequired": "请输入手机号",
-      "phoneInvalid": "手机号格式不正确",
+      "phoneInvalid": "请输入有效的美国手机号",
       "emailInvalid": "邮箱格式不正确",
       "config": "尚未配置 Supabase，当前无法提交签到。",
       "schema": "Supabase 数据表尚未初始化，请先执行 SQL 脚本。",
