@@ -2,6 +2,7 @@
 
 import Image from "next/image"
 import {useTranslations} from "next-intl"
+import { KioskQrDownload } from "@/components/kiosk/kiosk-qr-download"
 
 interface KioskWelcomeProps {
   onStart: () => void
@@ -46,6 +47,8 @@ export function KioskWelcome({ onStart }: KioskWelcomeProps) {
       <p className="text-sm text-muted-foreground/60">
         {t("hint")}
       </p>
+
+      <KioskQrDownload />
     </div>
   )
 }

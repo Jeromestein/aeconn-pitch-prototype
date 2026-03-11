@@ -6,7 +6,19 @@
     "title": "Welcome",
     "subtitle": "Quick check-in, seamless experience",
     "start": "Start Check-in",
-    "hint": "Tap to begin"
+    "hint": "Tap to begin",
+    "qr": {
+      "title": "Export Check-in QR",
+      "description": "Save this QR code as an image and place it on posters, booth signage, or reception materials so visitors can open the current check-in page directly.",
+      "hint": "Use the exported image at full size and keep a white margin around it for reliable scanning.",
+      "imageAlt": "Check-in QR preview",
+      "linkLabel": "Check-in link",
+      "loading": "Preparing link...",
+      "download": "Export QR Image",
+      "downloading": "Exporting...",
+      "copy": "Copy Link",
+      "copied": "Copied"
+    }
   },
   "kioskForm": {
     "title": "Check-in",
