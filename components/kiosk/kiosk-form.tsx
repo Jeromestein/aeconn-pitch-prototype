@@ -25,22 +25,23 @@ interface FormErrors {
   email?: string
 }
 
-function formatUsPhoneInput(value: string) {
-  const digits = value.replace(/\D/g, "").slice(0, 10)
-
-  if (digits.length <= 3) {
-    return digits
+function isValidInternationalPhone(value: string) {
+  const trimmed = value.trim()
+  if (!trimmed) {
+    return false
   }
 
-  if (digits.length <= 6) {
-    return `(${digits.slice(0, 3)}) ${digits.slice(3)}`
+  if (!/^\+?[\d\s\-()]+$/.test(trimmed)) {
+    return false
   }
 
-  return `(${digits.slice(0, 3)}) ${digits.slice(3, 6)}-${digits.slice(6)}`
-}
+  const plusCount = (trimmed.match(/\+/g) || []).length
+  if (plusCount > 1 || (plusCount === 1 && !trimmed.startsWith("+"))) {
+    return false
+  }
 
-function isValidUsPhone(value: string) {
-  return value.replace(/\D/g, "").length === 10
+  const digits = trimmed.replace(/\D/g, "")
+  return digits.length >= 7 && digits.length <= 15
 }
 
 export function KioskForm({ onSuccess, onReset }: KioskFormProps) {
@@ -82,7 +83,7 @@ export function KioskForm({ onSuccess, onReset }: KioskFormProps) {
 
     if (!form.phone.trim()) {
       newErrors.phone = t("errors.phoneRequired")
-    } else if (!isValidUsPhone(form.phone)) {
+    } else if (!isValidInternationalPhone(form.phone)) {
       newErrors.phone = t("errors.phoneInvalid")
     }
 
@@ -186,11 +187,11 @@ export function KioskForm({ onSuccess, onReset }: KioskFormProps) {
             placeholder={t("phonePlaceholder")}
             value={form.phone}
             onChange={(e) => {
-              setForm({ ...form, phone: formatUsPhoneInput(e.target.value) })
+              setForm({ ...form, phone: e.target.value })
               if (errors.phone) setErrors({ ...errors, phone: undefined })
             }}
-            inputMode="numeric"
-            autoComplete="tel-national"
+            inputMode="tel"
+            autoComplete="tel"
             className={`${inputClasses} ${errors.phone ? "border-destructive ring-1 ring-destructive/50" : "border-border hover:border-primary/40"}`}
           />
           {errors.phone && (

@@ -6,7 +6,7 @@ import { parseCheckinPayload, upsertContactAndCreateCheckin } from "@/lib/checki
 function getErrorMessage(code: string) {
   switch (code) {
     case "INVALID_PHONE":
-      return "Invalid phone number format."
+      return "Invalid phone number format. Include country code when needed."
     case "INVALID_EMAIL":
       return "Invalid email format."
     case "INVALID_PAYLOAD":

@@ -51,7 +51,7 @@
     "errors": {
       "nameRequired": "Please enter your name",
       "phoneRequired": "Please enter your phone number",
-      "phoneInvalid": "Please enter a valid US phone number",
+      "phoneInvalid": "Please enter a valid phone number with country code if needed",
       "emailInvalid": "Invalid email format",
       "config": "Supabase is not configured, so check-in is unavailable.",
       "schema": "Supabase tables are not initialized yet. Run the SQL script first.",

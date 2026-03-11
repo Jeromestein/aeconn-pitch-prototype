@@ -51,7 +51,7 @@
     "errors": {
       "nameRequired": "请输入姓名",
       "phoneRequired": "请输入手机号",
-      "phoneInvalid": "请输入有效的美国手机号",
+      "phoneInvalid": "请输入有效的手机号，国际号码请包含国家区号",
       "emailInvalid": "邮箱格式不正确",
       "config": "尚未配置 Supabase，当前无法提交签到。",
       "schema": "Supabase 数据表尚未初始化，请先执行 SQL 脚本。",
