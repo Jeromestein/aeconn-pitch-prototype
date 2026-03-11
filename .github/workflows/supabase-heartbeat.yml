@@ -1,0 +1,31 @@
+name: Supabase Heartbeat
+
+on:
+  schedule:
+    - cron: "0 15 * * 1"
+  workflow_dispatch:
+
+jobs:
+  heartbeat:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Ping heartbeat endpoint
+        env:
+          HEARTBEAT_URL: ${{ secrets.HEARTBEAT_URL }}
+          HEARTBEAT_SECRET: ${{ secrets.HEARTBEAT_SECRET }}
+        run: |
+          if [ -z "$HEARTBEAT_URL" ] || [ -z "$HEARTBEAT_SECRET" ]; then
+            echo "HEARTBEAT_URL and HEARTBEAT_SECRET must be configured."
+            exit 1
+          fi
+
+          response=$(curl --silent --show-error --fail-with-body \
+            --max-time 30 \
+            --retry 3 \
+            --retry-delay 5 \
+            --header "Authorization: Bearer $HEARTBEAT_SECRET" \
+            "$HEARTBEAT_URL")
+
+          echo "$response"
